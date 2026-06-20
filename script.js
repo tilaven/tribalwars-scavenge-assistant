@@ -1,5 +1,5 @@
 // author: tilaven
-// version: 0.0.2
+// version: 0.0.3
 
 (function () {
     'use strict';
@@ -289,7 +289,7 @@
                 }
                 var sr = stored.reserve || {};
                 var se = stored.enabled || {};
-                var d = {reserve: {}, enabled: {}};
+                var d = {reserve: {}, enabled: {}, collapsed: !!stored.collapsed}; // default expanded
                 Units.names().forEach(function (u) {
                     d.reserve[u] = u in sr ? (Number(sr[u]) || 0) : 0;     // default 0
                     d.enabled[u] = u in se ? !!se[u] : true;               // default on
@@ -319,6 +319,14 @@
         },
         setEnabled: function (unit, value) {
             this.load().enabled[unit] = !!value;
+            this.save();
+        },
+
+        collapsed: function () {
+            return !!this.load().collapsed;
+        },
+        setCollapsed: function (value) {
+            this.load().collapsed = !!value;
             this.save();
         }
     };
@@ -439,10 +447,27 @@
                     + '<tbody>' + rows + '</tbody></table>';
             }
 
+            var summaryStyle = 'cursor:pointer;margin:8px 0;padding:4px 8px;font-size:14px;font-weight:bold;'
+                + 'color:#5d4108;background:#f4e4bc;border:1px solid #c1a264;border-radius:3px;display:inline-block';
+
             var div = document.createElement('div');
             div.id = 'maz-settings';
-            div.innerHTML = '<h4 style="margin:6px 0">' + I18n.t('title') + '</h4>' + table;
-            container.prepend(div);
+            div.innerHTML = '<details' + (Settings.collapsed() ? '' : ' open') + '>'
+                + '<summary style="' + summaryStyle + '">' + I18n.t('title') + '</summary>'
+                + table + '</details>';
+
+            // place right after the game's explanatory text, not at the top of the screen
+            var anchor = container.querySelector('.explanatory-text');
+            if (anchor) {
+                anchor.insertAdjacentElement('afterend', div);
+            } else {
+                container.prepend(div);
+            }
+
+            var details = div.querySelector('details');
+            details.addEventListener('toggle', function () {
+                Settings.setCollapsed(!details.open);   // remember open/closed across loads
+            });
 
             div.querySelectorAll('[data-maz-enable]').forEach(function (cb) {
                 cb.addEventListener('change', function () {
