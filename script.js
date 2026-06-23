@@ -12,6 +12,9 @@
                 unit: 'Jednostka',
                 send: 'Wysyłaj',
                 reserve: 'Rezerwa',
+                order: 'Kolejność',
+                orderLowFirst: 'Od najniższego',
+                orderHighFirst: 'Od najwyższego',
                 redirecting: 'Skrypt działa tylko na ekranie zbieractwa, przekierowuję.',
                 filled: 'Wypełniono poziom {level} ({name}). Kliknij Start i odpal ponownie dla kolejnych.'
             },
@@ -20,6 +23,9 @@
                 unit: 'Unit',
                 send: 'Send',
                 reserve: 'Reserve',
+                order: 'Order',
+                orderLowFirst: 'Lowest first',
+                orderHighFirst: 'Highest first',
                 redirecting: 'Script works only in Scavenging page, redirecting.',
                 filled: 'Filled level {level} ({name}). Click Start, then run again for the next ones.'
             },
@@ -165,7 +171,7 @@
         },
 
         t: function (key, vars) {
-            var str = this.strings[this.lang()][key] || key;
+            var str = this.strings[this.lang()][key] || this.strings.en[key] || key;
             if (vars) {
                 Object.keys(vars).forEach(function (k) {
                     str = str.replace('{' + k + '}', vars[k]);
@@ -214,6 +220,9 @@
             available.sort(function (a, b) {
                 return a.level - b.level;
             });
+            if (Settings.order() === 'desc') {
+                available.reverse();               // fill highest level first
+            }
             return available;
         }
     };
@@ -289,7 +298,11 @@
                 }
                 var sr = stored.reserve || {};
                 var se = stored.enabled || {};
-                var d = {reserve: {}, enabled: {}, collapsed: !!stored.collapsed}; // default expanded
+                var d = {
+                    reserve: {}, enabled: {},
+                    collapsed: !!stored.collapsed,                       // default expanded
+                    order: stored.order === 'desc' ? 'desc' : 'asc'      // default lowest first
+                };
                 Units.names().forEach(function (u) {
                     d.reserve[u] = u in sr ? (Number(sr[u]) || 0) : 0;     // default 0
                     d.enabled[u] = u in se ? !!se[u] : true;               // default on
@@ -327,6 +340,14 @@
         },
         setCollapsed: function (value) {
             this.load().collapsed = !!value;
+            this.save();
+        },
+
+        order: function () {
+            return this.load().order;
+        },
+        setOrder: function (value) {
+            this.load().order = value === 'desc' ? 'desc' : 'asc';
             this.save();
         }
     };
@@ -429,7 +450,7 @@
                 var heads = Units.names().map(function (u) {
                     return '<th style="text-align:center">' + icon(u) + '</th>';
                 }).join('');
-                table = '<table class="vis" style="margin-bottom:8px"><tbody>'
+                table = '<table class="vis"><tbody>'
                     + '<tr><th></th>' + heads + '</tr>'
                     + '<tr><th>' + I18n.t('send') + '</th>' + cells(enableCell) + '</tr>'
                     + '<tr><th>' + I18n.t('reserve') + '</th>' + cells(reserveCell) + '</tr>'
@@ -442,19 +463,48 @@
                         + '<td style="text-align:center">' + reserveCell(u) + '</td>'
                         + '</tr>';
                 }).join('');
-                table = '<table class="vis" style="margin-bottom:8px">'
+                table = '<table class="vis">'
                     + '<thead><tr><th>' + I18n.t('unit') + '</th><th>' + I18n.t('send') + '</th><th>' + I18n.t('reserve') + '</th></tr></thead>'
                     + '<tbody>' + rows + '</tbody></table>';
             }
 
-            var summaryStyle = 'cursor:pointer;margin:8px 0;padding:4px 8px;font-size:14px;font-weight:bold;'
-                + 'color:#5d4108;background:#f4e4bc;border:1px solid #c1a264;border-radius:3px;display:inline-block';
+            // one cohesive box: header bar + table share a single gold frame.
+            // ::marker hidden; own ▸ arrow rotates to ▾ via the [open] state.
+            if (!document.getElementById('maz-style')) {
+                var style = document.createElement('style');
+                style.id = 'maz-style';
+                style.textContent =
+                    '#maz-settings details{margin:8px 0;border:1px solid #c1a264;border-radius:4px;'
+                    + 'background:#f4e4bc;overflow:hidden;display:inline-block;min-width:240px}'
+                    + '#maz-settings summary{cursor:pointer;padding:6px 10px;font-size:14px;font-weight:bold;'
+                    + 'color:#5d4108;list-style:none;user-select:none}'
+                    + '#maz-settings summary::-webkit-details-marker{display:none}'
+                    + '#maz-settings summary::before{content:"\\25B8";display:inline-block;margin-right:6px;'
+                    + 'transition:transform .15s}'
+                    + '#maz-settings details[open] summary::before{transform:rotate(90deg)}'
+                    + '#maz-settings details[open] summary{border-bottom:1px solid #c1a264}'
+                    + '#maz-settings table{margin:8px}'
+                    + '#maz-settings .maz-order{margin:0 8px 8px;font-size:13px;color:#5d4108}'
+                    // TW confirm-green fill (like .current-quest) + pulsing glow on the Start button to click
+                    + '@keyframes maz-pulse{0%,100%{box-shadow:0 0 4px 1px #0e7a1e}50%{box-shadow:0 0 12px 4px #13c600}}'
+                    + '.free_send_button.maz-highlight{animation:maz-pulse 1s infinite;color:#fff!important;'
+                    + 'border-color:#006712!important;'
+                    + 'background:#0bac00!important;'
+                    + 'background:linear-gradient(to bottom,#0bac00 0%,#0e7a1e 100%)!important}';
+                document.head.appendChild(style);
+            }
+
+            var orderRow = '<div class="maz-order">' + I18n.t('order') + ': '
+                + '<select data-maz-order>'
+                + '<option value="asc"' + (Settings.order() === 'asc' ? ' selected' : '') + '>' + I18n.t('orderLowFirst') + ' (1 → 4)</option>'
+                + '<option value="desc"' + (Settings.order() === 'desc' ? ' selected' : '') + '>' + I18n.t('orderHighFirst') + ' (4 → 1)</option>'
+                + '</select></div>';
 
             var div = document.createElement('div');
             div.id = 'maz-settings';
             div.innerHTML = '<details' + (Settings.collapsed() ? '' : ' open') + '>'
-                + '<summary style="' + summaryStyle + '">' + I18n.t('title') + '</summary>'
-                + table + '</details>';
+                + '<summary>' + I18n.t('title') + '</summary>'
+                + table + orderRow + '</details>';
 
             // place right after the game's explanatory text, not at the top of the screen
             var anchor = container.querySelector('.explanatory-text');
@@ -481,12 +531,18 @@
                     App.run();                               // re-split with the new setting
                 });
             });
+            div.querySelector('[data-maz-order]').addEventListener('change', function () {
+                Settings.setOrder(this.value);
+                App.run();                                   // refill starting from the chosen end
+            });
         }
     };
 
     var App = {
-        // recompute the split and fill the first free level's form
-        run: function () {
+        // recompute the split and fill the first free level's form.
+        // scroll=true (only on script launch) scrolls the filled level into view,
+        // handy on mobile; settings tweaks re-run without scrolling.
+        run: function (scroll) {
             var levels = AvailableLevels.get();
             if (levels.length < 1) {
                 return;                                    // nothing free to fill
@@ -494,6 +550,23 @@
             var plan = Planner.plan(levels);
             var filled = Dispatcher.fillFirst(plan);
             window.UI.InfoMessage(I18n.t('filled', {level: filled.level, name: filled.name}));
+
+            // level N is the Nth .scavenge-option in document order
+            var option = document.querySelectorAll('.scavenge-option')[filled.level - 1];
+
+            // move the green pulse onto the Start button we just filled for
+            document.querySelectorAll('.free_send_button.maz-highlight').forEach(function (b) {
+                b.classList.remove('maz-highlight');
+            });
+            if (option) {
+                var startBtn = option.querySelector('.free_send_button');
+                if (startBtn) {
+                    startBtn.classList.add('maz-highlight');
+                }
+                if (scroll) {
+                    option.scrollIntoView({behavior: 'smooth', block: 'center'});
+                }
+            }
         },
 
         start: function () {
@@ -504,7 +577,7 @@
             }
 
             SettingsUI.render();
-            this.run();
+            this.run(true);
         }
     };
 
