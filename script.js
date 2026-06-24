@@ -12,6 +12,7 @@
                 unit: 'Jednostka',
                 send: 'Wysyłaj',
                 reserve: 'Rezerwa',
+                skipFirst: 'Pomiń poziom 1',
                 order: 'Kolejność',
                 orderLowFirst: 'Od najniższego',
                 orderHighFirst: 'Od najwyższego',
@@ -23,6 +24,7 @@
                 unit: 'Unit',
                 send: 'Send',
                 reserve: 'Reserve',
+                skipFirst: 'Skip level 1',
                 order: 'Order',
                 orderLowFirst: 'Lowest first',
                 orderHighFirst: 'Highest first',
@@ -213,6 +215,9 @@
             var available = [];
             Object.keys(options).forEach(function (key) {
                 var opt = options[key];
+                if (Settings.skipFirst() && opt.base.id === 1) {
+                    return;                            // skip the weakest level when asked
+                }
                 if (!opt.is_locked && !opt.scavenging_squad) {
                     available.push({level: opt.base.id, name: opt.base.name, lootFactor: opt.base.loot_factor});
                 }
@@ -301,7 +306,8 @@
                 var d = {
                     reserve: {}, enabled: {},
                     collapsed: !!stored.collapsed,                       // default expanded
-                    order: stored.order === 'desc' ? 'desc' : 'asc'      // default lowest first
+                    order: stored.order === 'desc' ? 'desc' : 'asc',     // default lowest first
+                    skipFirst: !!stored.skipFirst                        // default include level 1
                 };
                 Units.names().forEach(function (u) {
                     d.reserve[u] = u in sr ? (Number(sr[u]) || 0) : 0;     // default 0
@@ -348,6 +354,14 @@
         },
         setOrder: function (value) {
             this.load().order = value === 'desc' ? 'desc' : 'asc';
+            this.save();
+        },
+
+        skipFirst: function () {
+            return !!this.load().skipFirst;
+        },
+        setSkipFirst: function (value) {
+            this.load().skipFirst = !!value;
             this.save();
         }
     };
@@ -498,7 +512,9 @@
                 + '<select data-maz-order>'
                 + '<option value="asc"' + (Settings.order() === 'asc' ? ' selected' : '') + '>' + I18n.t('orderLowFirst') + ' (1 → 4)</option>'
                 + '<option value="desc"' + (Settings.order() === 'desc' ? ' selected' : '') + '>' + I18n.t('orderHighFirst') + ' (4 → 1)</option>'
-                + '</select></div>';
+                + '</select></div>'
+                + '<div class="maz-order"><label><input type="checkbox" data-maz-skip-first'
+                + (Settings.skipFirst() ? ' checked' : '') + '> ' + I18n.t('skipFirst') + '</label></div>';
 
             var div = document.createElement('div');
             div.id = 'maz-settings';
@@ -534,6 +550,10 @@
             div.querySelector('[data-maz-order]').addEventListener('change', function () {
                 Settings.setOrder(this.value);
                 App.run();                                   // refill starting from the chosen end
+            });
+            div.querySelector('[data-maz-skip-first]').addEventListener('change', function () {
+                Settings.setSkipFirst(this.checked);
+                App.run();                                   // re-split without level 1
             });
         }
     };

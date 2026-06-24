@@ -4,6 +4,7 @@
 
 ### Added
 - **Auto-advance** - clicking the highlighted Start button sends the squad, then automatically fills and scrolls to the next free level (waits for the send to register, ~6s cap if it fails).
+- **Skip level 1** - optional setting to leave the weakest level out of the split; persisted in localStorage.
 
 ## 0.0.3
 
