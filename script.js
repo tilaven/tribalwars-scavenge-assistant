@@ -538,6 +538,43 @@
         }
     };
 
+    // green pulse on the Start button of the level we just filled. Clicking it sends
+    // the squad, so we then advance to the next free level automatically.
+    var Highlight = {
+        mark: function (option, level) {
+            // clear the cue from the previous run
+            document.querySelectorAll('.free_send_button.maz-highlight').forEach(function (b) {
+                b.classList.remove('maz-highlight');
+            });
+            if (!option) {
+                return;
+            }
+
+            var startBtn = option.querySelector('.free_send_button');
+            if (!startBtn) {
+                return;
+            }
+            startBtn.classList.add('maz-highlight');
+
+            // the squad send is async; wait until this level drops out of the free
+            // set (max ~6s) before re-running, else we'd just re-fill the same level.
+            startBtn.addEventListener('click', function () {
+                var tries = 0;
+                var poll = setInterval(function () {
+                    var stillFree = AvailableLevels.get().some(function (l) {
+                        return l.level === level;
+                    });
+                    if (!stillFree) {
+                        clearInterval(poll);
+                        App.run(true);                       // fill + scroll to the next level
+                    } else if (++tries > 20) {
+                        clearInterval(poll);                 // send failed (e.g. not enough units)
+                    }
+                }, 300);
+            }, {once: true});
+        }
+    };
+
     var App = {
         // recompute the split and fill the first free level's form.
         // scroll=true (only on script launch) scrolls the filled level into view,
@@ -551,21 +588,17 @@
             var filled = Dispatcher.fillFirst(plan);
             window.UI.InfoMessage(I18n.t('filled', {level: filled.level, name: filled.name}));
 
-            // level N is the Nth .scavenge-option in document order
-            var option = document.querySelectorAll('.scavenge-option')[filled.level - 1];
+            // level N is the Nth VISIBLE .scavenge-option in document order.
+            // mobile keeps hidden duplicate cards (offsetParent null) — skip those.
+            var visible = Array.prototype.filter.call(
+                document.querySelectorAll('.scavenge-option'),
+                function (o) { return o.offsetParent !== null; }
+            );
+            var option = visible[filled.level - 1];
 
-            // move the green pulse onto the Start button we just filled for
-            document.querySelectorAll('.free_send_button.maz-highlight').forEach(function (b) {
-                b.classList.remove('maz-highlight');
-            });
-            if (option) {
-                var startBtn = option.querySelector('.free_send_button');
-                if (startBtn) {
-                    startBtn.classList.add('maz-highlight');
-                }
-                if (scroll) {
-                    option.scrollIntoView({behavior: 'smooth', block: 'center'});
-                }
+            Highlight.mark(option, filled.level);
+            if (option && scroll) {
+                option.scrollIntoView({behavior: 'smooth', block: 'center'});
             }
         },
 

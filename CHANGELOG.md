@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- **Auto-advance** - clicking the highlighted Start button sends the squad, then automatically fills and scrolls to the next free level (waits for the send to register, ~6s cap if it fails).
+
 ## 0.0.3
 
 ### Added
