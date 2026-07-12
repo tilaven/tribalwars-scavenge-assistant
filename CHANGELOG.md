@@ -3,7 +3,7 @@
 ## Unreleased
 
 ### 0.0.5
-- **Max run time** - optional "Max time" setting (H:MM or plain minutes) caps each scavenge run's duration; troops are scaled down per level to fit. If fewer troops are available (e.g. due to reserves) the run is simply shorter. 0/empty = off; persisted in localStorage.
+- **Max run time** - optional "Max time" setting (hour/minute dropdowns, native wheel pickers on mobile) caps each scavenge run's duration; troops are scaled down per level to fit. If fewer troops are available (e.g. due to reserves) the run is simply shorter. 0:00 = off; persisted in localStorage.
 
 ### 0.0.4
 - **Auto-advance** - clicking the highlighted Start button sends the squad, then automatically fills and scrolls to the next free level (waits for the send to register, ~6s cap if it fails).

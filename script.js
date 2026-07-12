@@ -413,25 +413,6 @@
                 return 0;
             }
             return Math.sqrt(Math.pow(inner, 1 / 0.45) / (100 * lootFactor * lootFactor));
-        },
-
-        // "H:MM" or plain minutes → minutes (0 on junk)
-        parseMinutes: function (text) {
-            var m = /^\s*(\d+):([0-5]?\d)\s*$/.exec(text);
-            if (m) {
-                return Number(m[1]) * 60 + Number(m[2]);
-            }
-            return Math.max(0, Math.floor(Number(text)) || 0);
-        },
-
-        // minutes → "H:MM" ('' when 0/off)
-        formatMinutes: function (minutes) {
-            if (!minutes) {
-                return '';
-            }
-            var h = Math.floor(minutes / 60);
-            var mm = minutes % 60;
-            return h + ':' + (mm < 10 ? '0' : '') + mm;
         }
     };
 
@@ -584,6 +565,35 @@
                 document.head.appendChild(style);
             }
 
+            // hour/minute dropdowns for the max-time cap — native wheel pickers on
+            // mobile, no free-text parsing. 0:00 = cap off.
+            var maxH = Math.floor(Settings.maxDuration() / 60);
+            var maxM = Settings.maxDuration() % 60;
+            var maxHours = [];
+            for (var h = 0; h <= 24; h++) {
+                maxHours.push(h);
+            }
+            var maxMinutes = [];
+            for (var m = 0; m < 60; m += 5) {
+                maxMinutes.push(m);
+            }
+            // stored value may fall outside the fixed steps (e.g. old text input) —
+            // keep it selectable instead of silently snapping elsewhere
+            if (maxHours.indexOf(maxH) === -1) {
+                maxHours.push(maxH);
+            }
+            if (maxMinutes.indexOf(maxM) === -1) {
+                maxMinutes.push(maxM);
+                maxMinutes.sort(function (a, b) { return a - b; });
+            }
+
+            function timeOptions(values, selected, pad) {
+                return values.map(function (v) {
+                    return '<option value="' + v + '"' + (v === selected ? ' selected' : '') + '>'
+                        + (pad && v < 10 ? '0' : '') + v + '</option>';
+                }).join('');
+            }
+
             var orderRow = '<div class="maz-order">' + I18n.t('order') + ': '
                 + '<select data-maz-order>'
                 + '<option value="asc"' + (Settings.order() === 'asc' ? ' selected' : '') + '>' + I18n.t('orderLowFirst') + ' (1 → 4)</option>'
@@ -591,9 +601,11 @@
                 + '</select></div>'
                 + '<div class="maz-order"><label><input type="checkbox" data-maz-skip-first'
                 + (Settings.skipFirst() ? ' checked' : '') + '> ' + I18n.t('skipFirst') + '</label></div>'
-                + '<div class="maz-order"><label>' + I18n.t('maxTime') + ': '
-                + '<input type="text" size="5" data-maz-max-time placeholder="H:MM" value="'
-                + Duration.formatMinutes(Settings.maxDuration()) + '"></label></div>';
+                + '<div class="maz-order">' + I18n.t('maxTime') + ': '
+                + '<select data-maz-max-h>' + timeOptions(maxHours, maxH, false) + '</select>'
+                + ' : '
+                + '<select data-maz-max-m>' + timeOptions(maxMinutes, maxM, true) + '</select>'
+                + '</div>';
 
             var div = document.createElement('div');
             div.id = 'maz-settings';
@@ -634,10 +646,14 @@
                 Settings.setSkipFirst(this.checked);
                 App.run();                                   // re-split without level 1
             });
-            div.querySelector('[data-maz-max-time]').addEventListener('change', function () {
-                Settings.setMaxDuration(Duration.parseMinutes(this.value));
-                this.value = Duration.formatMinutes(Settings.maxDuration());  // normalize to H:MM
+            function onMaxTimeChange() {
+                var h = Number(div.querySelector('[data-maz-max-h]').value);
+                var m = Number(div.querySelector('[data-maz-max-m]').value);
+                Settings.setMaxDuration(h * 60 + m);
                 App.run();                                   // re-split under the new cap
+            }
+            div.querySelectorAll('[data-maz-max-h], [data-maz-max-m]').forEach(function (sel) {
+                sel.addEventListener('change', onMaxTimeChange);
             });
         }
     };
