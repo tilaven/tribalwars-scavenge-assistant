@@ -590,21 +590,17 @@
             }
             var end = new Date(endMs);
             window.UI.InfoMessage(I18n.t('alarmEndsAt', {time: end.toTimeString().slice(0, 5)}));
-            var isIos = /iPad|iPhone|iPod/.test(navigator.userAgent)
-                || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
             if (/android/i.test(navigator.userAgent)) {
                 this.androidIntent(end);
-            } else if (isIos) {
-                this.hostedIcs(end);
             } else {
-                this.downloadIcs(end);
+                this.hostedIcs(end);
             }
         },
 
-        // iOS Safari shows the native "Add All" event preview only for a real
-        // http(s) URL served as text/calendar — blob/data URLs and the share
-        // sheet can't reach Apple Calendar. ics.agical.io generates the .ics
-        // from query params, free and account-less.
+        // one .ics path for iOS and desktop: ics.agical.io generates the file from
+        // query params (free, account-less) and serves it as a text/calendar
+        // attachment — iOS Safari shows the native "Add All" event preview (which
+        // blob/data URLs can't trigger), desktop browsers just download it.
         // ponytail: third-party service; self-host a tiny worker if it dies.
         hostedIcs: function (end) {
             window.location.href = 'https://ics.agical.io/'
@@ -622,43 +618,6 @@
                 + ';i.android.intent.extra.alarm.MINUTES=' + end.getMinutes()
                 + ';S.android.intent.extra.alarm.MESSAGE=' + encodeURIComponent(I18n.t('title'))
                 + ';end';
-        },
-
-        // calendar event starting at the return time with a display alarm on it
-        icsContent: function (end) {
-            function utc(d) {
-                return d.toISOString().replace(/[-:]/g, '').replace(/\.\d+/, '');
-            }
-            return ['BEGIN:VCALENDAR',
-                'VERSION:2.0',
-                'PRODID:-//maz//scavenge-assistant//EN',
-                'BEGIN:VEVENT',
-                'UID:maz-' + end.getTime() + '@scavenge-assistant',
-                'DTSTAMP:' + utc(new Date()),
-                'DTSTART:' + utc(end),
-                'DTEND:' + utc(new Date(end.getTime() + 5 * 60000)),
-                'SUMMARY:' + I18n.t('title'),
-                'BEGIN:VALARM',
-                'ACTION:DISPLAY',
-                'DESCRIPTION:' + I18n.t('title'),
-                'TRIGGER:PT0S',
-                'END:VALARM',
-                'END:VEVENT',
-                'END:VCALENDAR'].join('\r\n');
-        },
-
-        downloadIcs: function (end) {
-            var blob = new Blob([this.icsContent(end)], {type: 'text/calendar'});
-            var url = URL.createObjectURL(blob);
-            var a = document.createElement('a');
-            a.href = url;
-            a.download = 'scavenge-alarm.ics';
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-            setTimeout(function () {
-                URL.revokeObjectURL(url);
-            }, 10000);
         }
     };
 
