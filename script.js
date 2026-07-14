@@ -589,9 +589,7 @@
                 return;
             }
             var end = new Date(endMs);
-            var hh = end.getHours();
-            var mm = end.getMinutes();
-            window.UI.InfoMessage(I18n.t('alarmEndsAt', {time: hh + ':' + (mm < 10 ? '0' : '') + mm}));
+            window.UI.InfoMessage(I18n.t('alarmEndsAt', {time: end.toTimeString().slice(0, 5)}));
             var isIos = /iPad|iPhone|iPod/.test(navigator.userAgent)
                 || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
             if (/android/i.test(navigator.userAgent)) {
@@ -651,17 +649,6 @@
 
         downloadIcs: function (end) {
             var blob = new Blob([this.icsContent(end)], {type: 'text/calendar'});
-            // iOS Safari ignores a.download on blob URLs — hand the file to the
-            // share sheet instead (user picks Calendar there).
-            var isIos = /iPad|iPhone|iPod/.test(navigator.userAgent)
-                || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-            if (isIos && navigator.canShare) {
-                var file = new File([blob], 'scavenge-alarm.ics', {type: 'text/calendar'});
-                if (navigator.canShare({files: [file]})) {
-                    navigator.share({files: [file]}).catch(function () {});
-                    return;
-                }
-            }
             var url = URL.createObjectURL(blob);
             var a = document.createElement('a');
             a.href = url;
