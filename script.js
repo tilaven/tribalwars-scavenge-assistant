@@ -17,6 +17,9 @@
                 orderLowFirst: 'Od najniższego',
                 orderHighFirst: 'Od najwyższego',
                 maxTime: 'Maks. czas',
+                setAlarm: 'Ustaw budzik',
+                alarmEndsAt: 'Najpóźniejsze zbieractwo kończy się o {time}.',
+                alarmNoRuns: 'Nic się teraz nie zbiera — najpierw wystartuj zbieractwo.',
                 redirecting: 'Skrypt działa tylko na ekranie zbieractwa, przekierowuję.',
                 filled: 'Wypełniono poziom {level} ({name}). Kliknij Start i odpal ponownie dla kolejnych.'
             },
@@ -30,6 +33,9 @@
                 orderLowFirst: 'Lowest first',
                 orderHighFirst: 'Highest first',
                 maxTime: 'Max time',
+                setAlarm: 'Set alarm',
+                alarmEndsAt: 'Latest scavenging run ends at {time}.',
+                alarmNoRuns: 'No scavenging run in progress — start one first.',
                 redirecting: 'Script works only in Scavenging page, redirecting.',
                 filled: 'Filled level {level} ({name}). Click Start, then run again for the next ones.'
             },
@@ -416,6 +422,99 @@
         }
     };
 
+    // "set alarm" for when the last running squad returns. web pages can't touch
+    // the system clock, so: Android → SET_ALARM intent (Clock opens pre-filled),
+    // elsewhere (iOS/desktop) → .ics calendar event with an alert at that moment.
+    var Alarm = {
+        // device-clock ms timestamp of the latest running squad's return, 0 when none.
+        // return_time is in server unix seconds — shift it through the game's server
+        // clock so a skewed device clock or timezone doesn't move the alarm.
+        latestReturn: function () {
+            var options = Scavenge.options();
+            var latest = 0;
+            Object.keys(options).forEach(function (key) {
+                var squad = options[key].scavenging_squad;
+                if (squad && squad.return_time) {
+                    latest = Math.max(latest, Number(squad.return_time));
+                }
+            });
+            if (!latest) {
+                // fallback: the screen's own countdowns carry the end time too
+                document.querySelectorAll('[data-endtime]').forEach(function (el) {
+                    latest = Math.max(latest, Number(el.getAttribute('data-endtime')) || 0);
+                });
+            }
+            if (!latest) {
+                return 0;
+            }
+            var t = window.Timing;
+            var serverNow = (t && t.getCurrentServerTime) ? t.getCurrentServerTime() : Date.now();
+            return Date.now() + (latest * 1000 - serverNow);
+        },
+
+        set: function () {
+            var endMs = this.latestReturn();
+            if (!endMs) {
+                window.UI.ErrorMessage(I18n.t('alarmNoRuns'));
+                return;
+            }
+            var end = new Date(endMs);
+            var hh = end.getHours();
+            var mm = end.getMinutes();
+            window.UI.InfoMessage(I18n.t('alarmEndsAt', {time: hh + ':' + (mm < 10 ? '0' : '') + mm}));
+            if (/android/i.test(navigator.userAgent)) {
+                this.androidIntent(end);
+            } else {
+                this.downloadIcs(end);
+            }
+        },
+
+        androidIntent: function (end) {
+            window.location.href = 'intent:#Intent;action=android.intent.action.SET_ALARM'
+                + ';i.android.intent.extra.alarm.HOUR=' + end.getHours()
+                + ';i.android.intent.extra.alarm.MINUTES=' + end.getMinutes()
+                + ';S.android.intent.extra.alarm.MESSAGE=' + encodeURIComponent(I18n.t('title'))
+                + ';end';
+        },
+
+        // calendar event starting at the return time with a display alarm on it
+        icsContent: function (end) {
+            function utc(d) {
+                return d.toISOString().replace(/[-:]/g, '').replace(/\.\d+/, '');
+            }
+            return ['BEGIN:VCALENDAR',
+                'VERSION:2.0',
+                'PRODID:-//maz//scavenge-assistant//EN',
+                'BEGIN:VEVENT',
+                'UID:maz-' + end.getTime() + '@scavenge-assistant',
+                'DTSTAMP:' + utc(new Date()),
+                'DTSTART:' + utc(end),
+                'DTEND:' + utc(new Date(end.getTime() + 5 * 60000)),
+                'SUMMARY:' + I18n.t('title'),
+                'BEGIN:VALARM',
+                'ACTION:DISPLAY',
+                'DESCRIPTION:' + I18n.t('title'),
+                'TRIGGER:PT0S',
+                'END:VALARM',
+                'END:VEVENT',
+                'END:VCALENDAR'].join('\r\n');
+        },
+
+        downloadIcs: function (end) {
+            var blob = new Blob([this.icsContent(end)], {type: 'text/calendar'});
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'scavenge-alarm.ics';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(function () {
+                URL.revokeObjectURL(url);
+            }, 10000);
+        }
+    };
+
     var Planner = {
         // levels: [{level, name}]
         // returns [{ level, name, units: {unit: count} }]
@@ -605,7 +704,9 @@
                 + '<select data-maz-max-h>' + timeOptions(maxHours, maxH, false) + '</select>'
                 + ' : '
                 + '<select data-maz-max-m>' + timeOptions(maxMinutes, maxM, true) + '</select>'
-                + '</div>';
+                + '</div>'
+                + '<div class="maz-order"><button type="button" class="btn" data-maz-alarm>'
+                + '&#9200; ' + I18n.t('setAlarm') + '</button></div>';
 
             var div = document.createElement('div');
             div.id = 'maz-settings';
@@ -654,6 +755,9 @@
             }
             div.querySelectorAll('[data-maz-max-h], [data-maz-max-m]').forEach(function (sel) {
                 sel.addEventListener('change', onMaxTimeChange);
+            });
+            div.querySelector('[data-maz-alarm]').addEventListener('click', function () {
+                Alarm.set();
             });
         }
     };

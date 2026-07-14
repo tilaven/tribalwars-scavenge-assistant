@@ -4,6 +4,7 @@
 
 ### 0.0.5
 - **Max run time** - optional "Max time" setting (hour/minute dropdowns, native wheel pickers on mobile) caps each scavenge run's duration; troops are scaled down per level to fit. If fewer troops are available (e.g. due to reserves) the run is simply shorter. 0:00 = off; persisted in localStorage.
+- **Set alarm button** - one tap schedules a wake-up for when the last running squad returns: on Android it opens the Clock app pre-filled via the SET_ALARM intent, elsewhere (iOS/desktop) it hands over an .ics calendar event with an alert. Return time is taken from the game's server clock, so a skewed device clock doesn't move it.
 
 ### 0.0.4
 - **Auto-advance** - clicking the highlighted Start button sends the squad, then automatically fills and scrolls to the next free level (waits for the send to register, ~6s cap if it fails).
