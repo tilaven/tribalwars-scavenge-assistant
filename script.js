@@ -1,5 +1,5 @@
 // author: tilaven
-// version: 0.0.4
+// version: 0.0.5
 
 (function () {
     'use strict';
@@ -16,6 +16,7 @@
                 order: 'Kolejność',
                 orderLowFirst: 'Od najniższego',
                 orderHighFirst: 'Od najwyższego',
+                maxTime: 'Maks. czas',
                 redirecting: 'Skrypt działa tylko na ekranie zbieractwa, przekierowuję.',
                 filled: 'Wypełniono poziom {level} ({name}). Kliknij Start i odpal ponownie dla kolejnych.'
             },
@@ -28,6 +29,7 @@
                 order: 'Order',
                 orderLowFirst: 'Lowest first',
                 orderHighFirst: 'Highest first',
+                maxTime: 'Max time',
                 redirecting: 'Script works only in Scavenging page, redirecting.',
                 filled: 'Filled level {level} ({name}). Click Start, then run again for the next ones.'
             },
@@ -307,7 +309,8 @@
                     reserve: {}, enabled: {},
                     collapsed: !!stored.collapsed,                       // default expanded
                     order: stored.order === 'desc' ? 'desc' : 'asc',     // default lowest first
-                    skipFirst: !!stored.skipFirst                        // default include level 1
+                    skipFirst: !!stored.skipFirst,                       // default include level 1
+                    maxDuration: Math.max(0, Number(stored.maxDuration) || 0)  // minutes, 0 = no cap
                 };
                 Units.names().forEach(function (u) {
                     d.reserve[u] = u in sr ? (Number(sr[u]) || 0) : 0;     // default 0
@@ -363,6 +366,14 @@
         setSkipFirst: function (value) {
             this.load().skipFirst = !!value;
             this.save();
+        },
+
+        maxDuration: function () {
+            return this.load().maxDuration || 0;
+        },
+        setMaxDuration: function (value) {
+            this.load().maxDuration = Math.max(0, Math.floor(Number(value)) || 0);
+            this.save();
         }
     };
 
@@ -371,6 +382,56 @@
         options: function () {
             var s = window.ScavengeScreen;
             return (s && s.village && s.village.options) || {};
+        }
+    };
+
+    // scavenge run duration math:
+    // duration_s = (pow(capacity^2 * 100 * loot_factor^2, 0.45) + 1800) * factor,
+    // factor = world_speed^-0.55 (1 on speed-1 worlds)
+    var Duration = {
+        // carry capacity per unit (matches Units.names())
+        CARRY: {spear: 25, sword: 15, axe: 10, archer: 10, light: 80, marcher: 50, heavy: 50},
+
+        factor: function () {
+            var speed = (window.game_data && Number(window.game_data.speed)) || 1;
+            return Math.pow(speed, -0.55);
+        },
+
+        // total carry capacity of a squad {unit: count}
+        capacity: function (units) {
+            var carry = this.CARRY;
+            return Object.keys(units).reduce(function (sum, u) {
+                return sum + units[u] * (carry[u] || 0);
+            }, 0);
+        },
+
+        // inverse of the formula: biggest capacity still finishing within maxSeconds.
+        // 0 when maxSeconds is under the fixed 1800s floor (no squad is fast enough).
+        maxCapacity: function (maxSeconds, lootFactor) {
+            var inner = maxSeconds / this.factor() - 1800;
+            if (inner <= 0) {
+                return 0;
+            }
+            return Math.sqrt(Math.pow(inner, 1 / 0.45) / (100 * lootFactor * lootFactor));
+        },
+
+        // "H:MM" or plain minutes → minutes (0 on junk)
+        parseMinutes: function (text) {
+            var m = /^\s*(\d+):([0-5]?\d)\s*$/.exec(text);
+            if (m) {
+                return Number(m[1]) * 60 + Number(m[2]);
+            }
+            return Math.max(0, Math.floor(Number(text)) || 0);
+        },
+
+        // minutes → "H:MM" ('' when 0/off)
+        formatMinutes: function (minutes) {
+            if (!minutes) {
+                return '';
+            }
+            var h = Math.floor(minutes / 60);
+            var mm = minutes % 60;
+            return h + ':' + (mm < 10 ? '0' : '') + mm;
         }
     };
 
@@ -403,6 +464,11 @@
                 avail[u] = Math.max(0, Units.available(u) - Settings.reserve(u));
             });
 
+            // cap: scale each level's squad down so its run fits in maxSeconds.
+            // the split equalizes finish time, so either every level exceeds the cap
+            // (all get trimmed to exactly T) or none does — no redistribution needed.
+            var maxSeconds = Settings.maxDuration() * 60;
+
             // same fraction of each unit to each level → capacity in proportion to weights
             return levels.map(function (lvl) {
                 var frac = weight[lvl.level] / sumW;
@@ -410,6 +476,16 @@
                 names.forEach(function (u) {
                     unitsToSend[u] = Math.floor(avail[u] * frac);
                 });
+                if (maxSeconds > 0) {
+                    var cap = Duration.maxCapacity(maxSeconds, lvl.lootFactor);
+                    var planned = Duration.capacity(unitsToSend);
+                    if (planned > cap) {
+                        var ratio = cap / planned;
+                        names.forEach(function (u) {
+                            unitsToSend[u] = Math.floor(unitsToSend[u] * ratio);
+                        });
+                    }
+                }
                 return {level: lvl.level, name: lvl.name, units: unitsToSend};
             });
         }
@@ -514,7 +590,10 @@
                 + '<option value="desc"' + (Settings.order() === 'desc' ? ' selected' : '') + '>' + I18n.t('orderHighFirst') + ' (4 → 1)</option>'
                 + '</select></div>'
                 + '<div class="maz-order"><label><input type="checkbox" data-maz-skip-first'
-                + (Settings.skipFirst() ? ' checked' : '') + '> ' + I18n.t('skipFirst') + '</label></div>';
+                + (Settings.skipFirst() ? ' checked' : '') + '> ' + I18n.t('skipFirst') + '</label></div>'
+                + '<div class="maz-order"><label>' + I18n.t('maxTime') + ': '
+                + '<input type="text" size="5" data-maz-max-time placeholder="H:MM" value="'
+                + Duration.formatMinutes(Settings.maxDuration()) + '"></label></div>';
 
             var div = document.createElement('div');
             div.id = 'maz-settings';
@@ -554,6 +633,11 @@
             div.querySelector('[data-maz-skip-first]').addEventListener('change', function () {
                 Settings.setSkipFirst(this.checked);
                 App.run();                                   // re-split without level 1
+            });
+            div.querySelector('[data-maz-max-time]').addEventListener('change', function () {
+                Settings.setMaxDuration(Duration.parseMinutes(this.value));
+                this.value = Duration.formatMinutes(Settings.maxDuration());  // normalize to H:MM
+                App.run();                                   // re-split under the new cap
             });
         }
     };
