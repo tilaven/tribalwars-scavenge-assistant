@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### 0.0.6
+- **iOS alarm fixed** - the .ics blob download was a silent no-op on iOS Safari. The button now links to a hosted .ics (ics.agical.io) generated from URL params, so Safari shows the native event preview with "Add All" - tap the button, tap Add, done. Event carries the organizer (tilaven) and a link to this repo. Android/desktop unchanged.
+- **Version in settings** - the settings header now shows the script version next to the (translated) title.
+- **Full translations** - added the missing strings (skip level 1, order, max time, set alarm + its messages) for all 16 remaining languages; previously they fell back to English.
+
 ### 0.0.5
 - **Max run time** - optional "Max time" setting (hour/minute dropdowns, native wheel pickers on mobile) caps each scavenge run's duration; troops are scaled down per level to fit. If fewer troops are available (e.g. due to reserves) the run is simply shorter. 0:00 = off; persisted in localStorage.
 - **Set alarm button** - one tap schedules a wake-up for when the last running squad returns: on Android it opens the Clock app pre-filled via the SET_ALARM intent, elsewhere (iOS/desktop) it hands over an .ics calendar event with an alert. Return time is taken from the game's server clock, so a skewed device clock doesn't move it.

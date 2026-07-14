@@ -1,8 +1,10 @@
 // author: tilaven
-// version: 0.0.5
+// version: 0.0.6
 
 (function () {
     'use strict';
+
+    var VERSION = '0.0.6';
 
     // pick game language from game_data.locale (Polish on pl_*, English otherwise)
     var I18n = {
@@ -44,6 +46,14 @@
                 unit: 'الوحدة',
                 send: 'إرسال',
                 reserve: 'احتياطي',
+                skipFirst: 'تخطي المستوى 1',
+                order: 'الترتيب',
+                orderLowFirst: 'من الأدنى',
+                orderHighFirst: 'من الأعلى',
+                maxTime: 'أقصى وقت',
+                setAlarm: 'ضبط المنبّه',
+                alarmEndsAt: 'آخر عملية نهب تنتهي في {time}.',
+                alarmNoRuns: 'لا يوجد نهب جارٍ الآن — ابدأ واحدًا أولاً.',
                 redirecting: 'هذا السكربت يعمل فقط في صفحة النهب، جارٍ إعادة التوجيه.',
                 filled: 'تم ملء المستوى {level} ({name}). اضغط ابدأ، ثم شغّل السكربت مرة أخرى للمستويات التالية.'
             },
@@ -52,6 +62,14 @@
                 unit: 'Jednotka',
                 send: 'Odeslat',
                 reserve: 'Rezerva',
+                skipFirst: 'Přeskočit úroveň 1',
+                order: 'Pořadí',
+                orderLowFirst: 'Od nejnižší',
+                orderHighFirst: 'Od nejvyšší',
+                maxTime: 'Max. čas',
+                setAlarm: 'Nastavit budík',
+                alarmEndsAt: 'Poslední sběr končí v {time}.',
+                alarmNoRuns: 'Právě neprobíhá žádný sběr — nejdřív nějaký spusť.',
                 redirecting: 'Skript funguje pouze na stránce sběru surovin, přesměrovávám.',
                 filled: 'Vyplněna úroveň {level} ({name}). Klikni na Start, poté spusť skript znovu pro další.'
             },
@@ -60,6 +78,14 @@
                 unit: 'Eenheid',
                 send: 'Versturen',
                 reserve: 'Reserve',
+                skipFirst: 'Niveau 1 overslaan',
+                order: 'Volgorde',
+                orderLowFirst: 'Laagste eerst',
+                orderHighFirst: 'Hoogste eerst',
+                maxTime: 'Max. tijd',
+                setAlarm: 'Wekker zetten',
+                alarmEndsAt: 'De laatste rooftocht eindigt om {time}.',
+                alarmNoRuns: 'Er loopt nu geen rooftocht — start er eerst een.',
                 redirecting: 'Script werkt alleen op de rooftochten-pagina, doorverwijzen.',
                 filled: 'Niveau {level} ({name}) ingevuld. Klik op Start en voer opnieuw uit voor de volgende.'
             },
@@ -68,6 +94,14 @@
                 unit: 'Unité',
                 send: 'Envoyer',
                 reserve: 'Réserve',
+                skipFirst: 'Ignorer le niveau 1',
+                order: 'Ordre',
+                orderLowFirst: 'Du plus bas',
+                orderHighFirst: 'Du plus haut',
+                maxTime: 'Temps max',
+                setAlarm: 'Régler le réveil',
+                alarmEndsAt: 'La dernière collecte se termine à {time}.',
+                alarmNoRuns: 'Aucune collecte en cours — lancez-en une d\'abord.',
                 redirecting: 'Le script fonctionne uniquement sur la page de collecte, redirection.',
                 filled: 'Niveau {level} ({name}) rempli. Cliquez sur Démarrer, puis relancez pour les suivants.'
             },
@@ -76,6 +110,14 @@
                 unit: 'Einheit',
                 send: 'Senden',
                 reserve: 'Reserve',
+                skipFirst: 'Stufe 1 überspringen',
+                order: 'Reihenfolge',
+                orderLowFirst: 'Niedrigste zuerst',
+                orderHighFirst: 'Höchste zuerst',
+                maxTime: 'Max. Zeit',
+                setAlarm: 'Wecker stellen',
+                alarmEndsAt: 'Der letzte Raubzug endet um {time}.',
+                alarmNoRuns: 'Es läuft gerade kein Raubzug — starte zuerst einen.',
                 redirecting: 'Skript funktioniert nur auf der Raubzug-Seite, leite weiter.',
                 filled: 'Stufe {level} ({name}) ausgefüllt. Klicke auf Start und führe das Skript erneut aus für die nächsten.'
             },
@@ -84,6 +126,14 @@
                 unit: 'Unidad',
                 send: 'Enviar',
                 reserve: 'Reserva',
+                skipFirst: 'Omitir nivel 1',
+                order: 'Orden',
+                orderLowFirst: 'Del más bajo',
+                orderHighFirst: 'Del más alto',
+                maxTime: 'Tiempo máx.',
+                setAlarm: 'Poner alarma',
+                alarmEndsAt: 'La última recolección termina a las {time}.',
+                alarmNoRuns: 'No hay recolección en curso — inicia una primero.',
                 redirecting: 'El script solo funciona en la página de recolección, redirigiendo.',
                 filled: 'Nivel {level} ({name}) rellenado. Haz clic en Iniciar y vuelve a ejecutar para los siguientes.'
             },
@@ -92,6 +142,14 @@
                 unit: 'Unità',
                 send: 'Invia',
                 reserve: 'Riserva',
+                skipFirst: 'Salta livello 1',
+                order: 'Ordine',
+                orderLowFirst: 'Dal più basso',
+                orderHighFirst: 'Dal più alto',
+                maxTime: 'Tempo max',
+                setAlarm: 'Imposta sveglia',
+                alarmEndsAt: 'L\'ultimo rovistamento termina alle {time}.',
+                alarmNoRuns: 'Nessun rovistamento in corso — avviane prima uno.',
                 redirecting: 'Lo script funziona solo nella pagina di rovistamento, reindirizzamento.',
                 filled: 'Livello {level} ({name}) compilato. Clicca Avvia, poi riavvia lo script per i successivi.'
             },
@@ -100,6 +158,14 @@
                 unit: 'Unidade',
                 send: 'Enviar',
                 reserve: 'Reserva',
+                skipFirst: 'Saltar nível 1',
+                order: 'Ordem',
+                orderLowFirst: 'Do mais baixo',
+                orderHighFirst: 'Do mais alto',
+                maxTime: 'Tempo máx.',
+                setAlarm: 'Definir alarme',
+                alarmEndsAt: 'A última busca termina às {time}.',
+                alarmNoRuns: 'Nenhuma busca em curso — inicia uma primeiro.',
                 redirecting: 'O script só funciona na página de busca minuciosa, a redirecionar.',
                 filled: 'Nível {level} ({name}) preenchido. Clica em Iniciar e executa novamente para os próximos.'
             },
@@ -108,6 +174,14 @@
                 unit: 'Unidade',
                 send: 'Enviar',
                 reserve: 'Reserva',
+                skipFirst: 'Pular nível 1',
+                order: 'Ordem',
+                orderLowFirst: 'Do mais baixo',
+                orderHighFirst: 'Do mais alto',
+                maxTime: 'Tempo máx.',
+                setAlarm: 'Definir alarme',
+                alarmEndsAt: 'A última coleta termina às {time}.',
+                alarmNoRuns: 'Nenhuma coleta em andamento — inicie uma primeiro.',
                 redirecting: 'O script só funciona na página de coleta, redirecionando.',
                 filled: 'Nível {level} ({name}) preenchido. Clique em Iniciar e execute novamente para os próximos.'
             },
@@ -116,6 +190,14 @@
                 unit: 'Unitate',
                 send: 'Trimite',
                 reserve: 'Rezervă',
+                skipFirst: 'Omite nivelul 1',
+                order: 'Ordine',
+                orderLowFirst: 'De la cel mai mic',
+                orderHighFirst: 'De la cel mai mare',
+                maxTime: 'Timp max.',
+                setAlarm: 'Setează alarma',
+                alarmEndsAt: 'Ultima curățare se termină la {time}.',
+                alarmNoRuns: 'Nicio curățare în desfășurare — pornește una mai întâi.',
                 redirecting: 'Scriptul funcționează doar pe pagina de curățare, redirecționare.',
                 filled: 'Nivelul {level} ({name}) completat. Apasă Start, apoi rulează din nou pentru următoarele.'
             },
@@ -124,6 +206,14 @@
                 unit: 'Jednotka',
                 send: 'Odoslať',
                 reserve: 'Rezerva',
+                skipFirst: 'Preskočiť úroveň 1',
+                order: 'Poradie',
+                orderLowFirst: 'Od najnižšej',
+                orderHighFirst: 'Od najvyššej',
+                maxTime: 'Max. čas',
+                setAlarm: 'Nastaviť budík',
+                alarmEndsAt: 'Posledný zber končí o {time}.',
+                alarmNoRuns: 'Momentálne neprebieha žiadny zber — najprv nejaký spusti.',
                 redirecting: 'Skript funguje iba na stránke zberu surovín, presmerovanie.',
                 filled: 'Úroveň {level} ({name}) vyplnená. Klikni na Štart, potom spusti znova pre ďalšie.'
             },
@@ -132,6 +222,14 @@
                 unit: 'Egység',
                 send: 'Küldés',
                 reserve: 'Tartalék',
+                skipFirst: '1. szint kihagyása',
+                order: 'Sorrend',
+                orderLowFirst: 'Legalacsonyabbtól',
+                orderHighFirst: 'Legmagasabbtól',
+                maxTime: 'Max. idő',
+                setAlarm: 'Ébresztő beállítása',
+                alarmEndsAt: 'Az utolsó gyűjtögetés ekkor ér véget: {time}.',
+                alarmNoRuns: 'Jelenleg nincs folyamatban gyűjtögetés — előbb indíts egyet.',
                 redirecting: 'A szkript csak a gyűjtögetés oldalon működik, átirányítás.',
                 filled: '{level} ({name}) szint kitöltve. Kattints a Start gombra, majd futtasd újra a többihez.'
             },
@@ -140,6 +238,14 @@
                 unit: 'Μονάδα',
                 send: 'Αποστολή',
                 reserve: 'Εφεδρεία',
+                skipFirst: 'Παράλειψη επιπέδου 1',
+                order: 'Σειρά',
+                orderLowFirst: 'Από το χαμηλότερο',
+                orderHighFirst: 'Από το υψηλότερο',
+                maxTime: 'Μέγ. χρόνος',
+                setAlarm: 'Ρύθμιση ξυπνητηριού',
+                alarmEndsAt: 'Η τελευταία σάρωση τελειώνει στις {time}.',
+                alarmNoRuns: 'Δεν υπάρχει σάρωση σε εξέλιξη — ξεκίνησε πρώτα μία.',
                 redirecting: 'Το script λειτουργεί μόνο στη σελίδα σάρωσης, ανακατεύθυνση.',
                 filled: 'Συμπληρώθηκε το επίπεδο {level} ({name}). Πάτησε Έναρξη και τρέξε ξανά για τα επόμενα.'
             },
@@ -148,6 +254,14 @@
                 unit: 'Birim',
                 send: 'Gönder',
                 reserve: 'Yedek',
+                skipFirst: '1. seviyeyi atla',
+                order: 'Sıralama',
+                orderLowFirst: 'En düşükten',
+                orderHighFirst: 'En yüksekten',
+                maxTime: 'Maks. süre',
+                setAlarm: 'Alarm kur',
+                alarmEndsAt: 'Son temizlik şu saatte bitiyor: {time}.',
+                alarmNoRuns: 'Şu anda temizlik yok — önce bir tane başlat.',
                 redirecting: 'Komut dosyası yalnızca temizlik sayfasında çalışır, yönlendiriliyor.',
                 filled: '{level} ({name}) seviyesi dolduruldu. Başlat\'a tıkla, sonra sonrakiler için tekrar çalıştır.'
             },
@@ -156,6 +270,14 @@
                 unit: 'Юнит',
                 send: 'Отправить',
                 reserve: 'Резерв',
+                skipFirst: 'Пропустить уровень 1',
+                order: 'Порядок',
+                orderLowFirst: 'С низшего',
+                orderHighFirst: 'С высшего',
+                maxTime: 'Макс. время',
+                setAlarm: 'Поставить будильник',
+                alarmEndsAt: 'Последний сбор заканчивается в {time}.',
+                alarmNoRuns: 'Сейчас ничего не собирается — сначала запусти сбор.',
                 redirecting: 'Скрипт работает только на странице сбора ресурсов, перенаправление.',
                 filled: 'Уровень {level} ({name}) заполнен. Нажми Старт, затем запусти снова для следующих.'
             },
@@ -164,6 +286,14 @@
                 unit: 'Юніт',
                 send: 'Відправити',
                 reserve: 'Резерв',
+                skipFirst: 'Пропустити рівень 1',
+                order: 'Порядок',
+                orderLowFirst: 'Від найнижчого',
+                orderHighFirst: 'Від найвищого',
+                maxTime: 'Макс. час',
+                setAlarm: 'Поставити будильник',
+                alarmEndsAt: 'Останній збір закінчується о {time}.',
+                alarmNoRuns: 'Зараз нічого не збирається — спочатку запусти збір.',
                 redirecting: 'Скрипт працює лише на сторінці збору ресурсів, перенаправлення.',
                 filled: 'Рівень {level} ({name}) заповнено. Натисни Старт, потім запусти знову для наступних.'
             }
@@ -462,11 +592,30 @@
             var hh = end.getHours();
             var mm = end.getMinutes();
             window.UI.InfoMessage(I18n.t('alarmEndsAt', {time: hh + ':' + (mm < 10 ? '0' : '') + mm}));
+            var isIos = /iPad|iPhone|iPod/.test(navigator.userAgent)
+                || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
             if (/android/i.test(navigator.userAgent)) {
                 this.androidIntent(end);
+            } else if (isIos) {
+                this.hostedIcs(end);
             } else {
                 this.downloadIcs(end);
             }
+        },
+
+        // iOS Safari shows the native "Add All" event preview only for a real
+        // http(s) URL served as text/calendar — blob/data URLs and the share
+        // sheet can't reach Apple Calendar. ics.agical.io generates the .ics
+        // from query params, free and account-less.
+        // ponytail: third-party service; self-host a tiny worker if it dies.
+        hostedIcs: function (end) {
+            window.location.href = 'https://ics.agical.io/'
+                + '?subject=' + encodeURIComponent(I18n.t('title'))
+                + '&dtstart=' + encodeURIComponent(end.toISOString())
+                + '&dtend=' + encodeURIComponent(new Date(end.getTime() + 5 * 60000).toISOString())
+                + '&reminder=0'
+                + '&organizer=tilaven'
+                + '&description=' + encodeURIComponent('https://github.com/tilaven/tribalwars-scavenge-assistant/');
         },
 
         androidIntent: function (end) {
@@ -502,6 +651,17 @@
 
         downloadIcs: function (end) {
             var blob = new Blob([this.icsContent(end)], {type: 'text/calendar'});
+            // iOS Safari ignores a.download on blob URLs — hand the file to the
+            // share sheet instead (user picks Calendar there).
+            var isIos = /iPad|iPhone|iPod/.test(navigator.userAgent)
+                || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            if (isIos && navigator.canShare) {
+                var file = new File([blob], 'scavenge-alarm.ics', {type: 'text/calendar'});
+                if (navigator.canShare({files: [file]})) {
+                    navigator.share({files: [file]}).catch(function () {});
+                    return;
+                }
+            }
             var url = URL.createObjectURL(blob);
             var a = document.createElement('a');
             a.href = url;
@@ -704,15 +864,16 @@
                 + '<select data-maz-max-h>' + timeOptions(maxHours, maxH, false) + '</select>'
                 + ' : '
                 + '<select data-maz-max-m>' + timeOptions(maxMinutes, maxM, true) + '</select>'
-                + '</div>'
-                + '<div class="maz-order"><button type="button" class="btn" data-maz-alarm>'
-                + '&#9200; ' + I18n.t('setAlarm') + '</button></div>';
+                + '</div>';
 
             var div = document.createElement('div');
             div.id = 'maz-settings';
             div.innerHTML = '<details' + (Settings.collapsed() ? '' : ' open') + '>'
-                + '<summary>' + I18n.t('title') + '</summary>'
-                + table + orderRow + '</details>';
+                + '<summary>' + I18n.t('title') + ' <small style="opacity:.6">v' + VERSION + '</small></summary>'
+                + table + orderRow + '</details>'
+                // outside the <details> so it stays visible when settings are collapsed
+                + '<div class="maz-order"><button type="button" class="btn" data-maz-alarm>'
+                + '&#9200; ' + I18n.t('setAlarm') + '</button></div>';
 
             // place right after the game's explanatory text, not at the top of the screen
             var anchor = container.querySelector('.explanatory-text');
