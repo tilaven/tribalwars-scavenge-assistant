@@ -1,10 +1,10 @@
 // author: tilaven
-// version: 0.0.6
+// version: 0.0.7
 
 (function () {
     'use strict';
 
-    var VERSION = '0.0.6';
+    var VERSION = '0.0.7';
 
     // pick game language from game_data.locale (Polish on pl_*, English otherwise)
     var I18n = {
@@ -19,9 +19,6 @@
                 orderLowFirst: 'Od najniższego',
                 orderHighFirst: 'Od najwyższego',
                 maxTime: 'Maks. czas',
-                setAlarm: 'Ustaw budzik',
-                alarmEndsAt: 'Najpóźniejsze zbieractwo kończy się o {time}.',
-                alarmNoRuns: 'Nic się teraz nie zbiera — najpierw wystartuj zbieractwo.',
                 redirecting: 'Skrypt działa tylko na ekranie zbieractwa, przekierowuję.',
                 filled: 'Wypełniono poziom {level} ({name}). Kliknij Start i odpal ponownie dla kolejnych.'
             },
@@ -35,9 +32,6 @@
                 orderLowFirst: 'Lowest first',
                 orderHighFirst: 'Highest first',
                 maxTime: 'Max time',
-                setAlarm: 'Set alarm',
-                alarmEndsAt: 'Latest scavenging run ends at {time}.',
-                alarmNoRuns: 'No scavenging run in progress — start one first.',
                 redirecting: 'Script works only in Scavenging page, redirecting.',
                 filled: 'Filled level {level} ({name}). Click Start, then run again for the next ones.'
             },
@@ -51,9 +45,6 @@
                 orderLowFirst: 'من الأدنى',
                 orderHighFirst: 'من الأعلى',
                 maxTime: 'أقصى وقت',
-                setAlarm: 'ضبط المنبّه',
-                alarmEndsAt: 'آخر عملية نهب تنتهي في {time}.',
-                alarmNoRuns: 'لا يوجد نهب جارٍ الآن — ابدأ واحدًا أولاً.',
                 redirecting: 'هذا السكربت يعمل فقط في صفحة النهب، جارٍ إعادة التوجيه.',
                 filled: 'تم ملء المستوى {level} ({name}). اضغط ابدأ، ثم شغّل السكربت مرة أخرى للمستويات التالية.'
             },
@@ -67,9 +58,6 @@
                 orderLowFirst: 'Od nejnižší',
                 orderHighFirst: 'Od nejvyšší',
                 maxTime: 'Max. čas',
-                setAlarm: 'Nastavit budík',
-                alarmEndsAt: 'Poslední sběr končí v {time}.',
-                alarmNoRuns: 'Právě neprobíhá žádný sběr — nejdřív nějaký spusť.',
                 redirecting: 'Skript funguje pouze na stránce sběru surovin, přesměrovávám.',
                 filled: 'Vyplněna úroveň {level} ({name}). Klikni na Start, poté spusť skript znovu pro další.'
             },
@@ -83,9 +71,6 @@
                 orderLowFirst: 'Laagste eerst',
                 orderHighFirst: 'Hoogste eerst',
                 maxTime: 'Max. tijd',
-                setAlarm: 'Wekker zetten',
-                alarmEndsAt: 'De laatste rooftocht eindigt om {time}.',
-                alarmNoRuns: 'Er loopt nu geen rooftocht — start er eerst een.',
                 redirecting: 'Script werkt alleen op de rooftochten-pagina, doorverwijzen.',
                 filled: 'Niveau {level} ({name}) ingevuld. Klik op Start en voer opnieuw uit voor de volgende.'
             },
@@ -99,9 +84,6 @@
                 orderLowFirst: 'Du plus bas',
                 orderHighFirst: 'Du plus haut',
                 maxTime: 'Temps max',
-                setAlarm: 'Régler le réveil',
-                alarmEndsAt: 'La dernière collecte se termine à {time}.',
-                alarmNoRuns: 'Aucune collecte en cours — lancez-en une d\'abord.',
                 redirecting: 'Le script fonctionne uniquement sur la page de collecte, redirection.',
                 filled: 'Niveau {level} ({name}) rempli. Cliquez sur Démarrer, puis relancez pour les suivants.'
             },
@@ -115,9 +97,6 @@
                 orderLowFirst: 'Niedrigste zuerst',
                 orderHighFirst: 'Höchste zuerst',
                 maxTime: 'Max. Zeit',
-                setAlarm: 'Wecker stellen',
-                alarmEndsAt: 'Der letzte Raubzug endet um {time}.',
-                alarmNoRuns: 'Es läuft gerade kein Raubzug — starte zuerst einen.',
                 redirecting: 'Skript funktioniert nur auf der Raubzug-Seite, leite weiter.',
                 filled: 'Stufe {level} ({name}) ausgefüllt. Klicke auf Start und führe das Skript erneut aus für die nächsten.'
             },
@@ -131,9 +110,6 @@
                 orderLowFirst: 'Del más bajo',
                 orderHighFirst: 'Del más alto',
                 maxTime: 'Tiempo máx.',
-                setAlarm: 'Poner alarma',
-                alarmEndsAt: 'La última recolección termina a las {time}.',
-                alarmNoRuns: 'No hay recolección en curso — inicia una primero.',
                 redirecting: 'El script solo funciona en la página de recolección, redirigiendo.',
                 filled: 'Nivel {level} ({name}) rellenado. Haz clic en Iniciar y vuelve a ejecutar para los siguientes.'
             },
@@ -147,9 +123,6 @@
                 orderLowFirst: 'Dal più basso',
                 orderHighFirst: 'Dal più alto',
                 maxTime: 'Tempo max',
-                setAlarm: 'Imposta sveglia',
-                alarmEndsAt: 'L\'ultimo rovistamento termina alle {time}.',
-                alarmNoRuns: 'Nessun rovistamento in corso — avviane prima uno.',
                 redirecting: 'Lo script funziona solo nella pagina di rovistamento, reindirizzamento.',
                 filled: 'Livello {level} ({name}) compilato. Clicca Avvia, poi riavvia lo script per i successivi.'
             },
@@ -163,9 +136,6 @@
                 orderLowFirst: 'Do mais baixo',
                 orderHighFirst: 'Do mais alto',
                 maxTime: 'Tempo máx.',
-                setAlarm: 'Definir alarme',
-                alarmEndsAt: 'A última busca termina às {time}.',
-                alarmNoRuns: 'Nenhuma busca em curso — inicia uma primeiro.',
                 redirecting: 'O script só funciona na página de busca minuciosa, a redirecionar.',
                 filled: 'Nível {level} ({name}) preenchido. Clica em Iniciar e executa novamente para os próximos.'
             },
@@ -179,9 +149,6 @@
                 orderLowFirst: 'Do mais baixo',
                 orderHighFirst: 'Do mais alto',
                 maxTime: 'Tempo máx.',
-                setAlarm: 'Definir alarme',
-                alarmEndsAt: 'A última coleta termina às {time}.',
-                alarmNoRuns: 'Nenhuma coleta em andamento — inicie uma primeiro.',
                 redirecting: 'O script só funciona na página de coleta, redirecionando.',
                 filled: 'Nível {level} ({name}) preenchido. Clique em Iniciar e execute novamente para os próximos.'
             },
@@ -195,9 +162,6 @@
                 orderLowFirst: 'De la cel mai mic',
                 orderHighFirst: 'De la cel mai mare',
                 maxTime: 'Timp max.',
-                setAlarm: 'Setează alarma',
-                alarmEndsAt: 'Ultima curățare se termină la {time}.',
-                alarmNoRuns: 'Nicio curățare în desfășurare — pornește una mai întâi.',
                 redirecting: 'Scriptul funcționează doar pe pagina de curățare, redirecționare.',
                 filled: 'Nivelul {level} ({name}) completat. Apasă Start, apoi rulează din nou pentru următoarele.'
             },
@@ -211,9 +175,6 @@
                 orderLowFirst: 'Od najnižšej',
                 orderHighFirst: 'Od najvyššej',
                 maxTime: 'Max. čas',
-                setAlarm: 'Nastaviť budík',
-                alarmEndsAt: 'Posledný zber končí o {time}.',
-                alarmNoRuns: 'Momentálne neprebieha žiadny zber — najprv nejaký spusti.',
                 redirecting: 'Skript funguje iba na stránke zberu surovín, presmerovanie.',
                 filled: 'Úroveň {level} ({name}) vyplnená. Klikni na Štart, potom spusti znova pre ďalšie.'
             },
@@ -227,9 +188,6 @@
                 orderLowFirst: 'Legalacsonyabbtól',
                 orderHighFirst: 'Legmagasabbtól',
                 maxTime: 'Max. idő',
-                setAlarm: 'Ébresztő beállítása',
-                alarmEndsAt: 'Az utolsó gyűjtögetés ekkor ér véget: {time}.',
-                alarmNoRuns: 'Jelenleg nincs folyamatban gyűjtögetés — előbb indíts egyet.',
                 redirecting: 'A szkript csak a gyűjtögetés oldalon működik, átirányítás.',
                 filled: '{level} ({name}) szint kitöltve. Kattints a Start gombra, majd futtasd újra a többihez.'
             },
@@ -243,9 +201,6 @@
                 orderLowFirst: 'Από το χαμηλότερο',
                 orderHighFirst: 'Από το υψηλότερο',
                 maxTime: 'Μέγ. χρόνος',
-                setAlarm: 'Ρύθμιση ξυπνητηριού',
-                alarmEndsAt: 'Η τελευταία σάρωση τελειώνει στις {time}.',
-                alarmNoRuns: 'Δεν υπάρχει σάρωση σε εξέλιξη — ξεκίνησε πρώτα μία.',
                 redirecting: 'Το script λειτουργεί μόνο στη σελίδα σάρωσης, ανακατεύθυνση.',
                 filled: 'Συμπληρώθηκε το επίπεδο {level} ({name}). Πάτησε Έναρξη και τρέξε ξανά για τα επόμενα.'
             },
@@ -259,9 +214,6 @@
                 orderLowFirst: 'En düşükten',
                 orderHighFirst: 'En yüksekten',
                 maxTime: 'Maks. süre',
-                setAlarm: 'Alarm kur',
-                alarmEndsAt: 'Son temizlik şu saatte bitiyor: {time}.',
-                alarmNoRuns: 'Şu anda temizlik yok — önce bir tane başlat.',
                 redirecting: 'Komut dosyası yalnızca temizlik sayfasında çalışır, yönlendiriliyor.',
                 filled: '{level} ({name}) seviyesi dolduruldu. Başlat\'a tıkla, sonra sonrakiler için tekrar çalıştır.'
             },
@@ -275,9 +227,6 @@
                 orderLowFirst: 'С низшего',
                 orderHighFirst: 'С высшего',
                 maxTime: 'Макс. время',
-                setAlarm: 'Поставить будильник',
-                alarmEndsAt: 'Последний сбор заканчивается в {time}.',
-                alarmNoRuns: 'Сейчас ничего не собирается — сначала запусти сбор.',
                 redirecting: 'Скрипт работает только на странице сбора ресурсов, перенаправление.',
                 filled: 'Уровень {level} ({name}) заполнен. Нажми Старт, затем запусти снова для следующих.'
             },
@@ -291,9 +240,6 @@
                 orderLowFirst: 'Від найнижчого',
                 orderHighFirst: 'Від найвищого',
                 maxTime: 'Макс. час',
-                setAlarm: 'Поставити будильник',
-                alarmEndsAt: 'Останній збір закінчується о {time}.',
-                alarmNoRuns: 'Зараз нічого не збирається — спочатку запусти збір.',
                 redirecting: 'Скрипт працює лише на сторінці збору ресурсів, перенаправлення.',
                 filled: 'Рівень {level} ({name}) заповнено. Натисни Старт, потім запусти знову для наступних.'
             }
@@ -552,75 +498,6 @@
         }
     };
 
-    // "set alarm" for when the last running squad returns. web pages can't touch
-    // the system clock, so: Android → SET_ALARM intent (Clock opens pre-filled),
-    // elsewhere (iOS/desktop) → .ics calendar event with an alert at that moment.
-    var Alarm = {
-        // device-clock ms timestamp of the latest running squad's return, 0 when none.
-        // return_time is in server unix seconds — shift it through the game's server
-        // clock so a skewed device clock or timezone doesn't move the alarm.
-        latestReturn: function () {
-            var options = Scavenge.options();
-            var latest = 0;
-            Object.keys(options).forEach(function (key) {
-                var squad = options[key].scavenging_squad;
-                if (squad && squad.return_time) {
-                    latest = Math.max(latest, Number(squad.return_time));
-                }
-            });
-            if (!latest) {
-                // fallback: the screen's own countdowns carry the end time too
-                document.querySelectorAll('[data-endtime]').forEach(function (el) {
-                    latest = Math.max(latest, Number(el.getAttribute('data-endtime')) || 0);
-                });
-            }
-            if (!latest) {
-                return 0;
-            }
-            var t = window.Timing;
-            var serverNow = (t && t.getCurrentServerTime) ? t.getCurrentServerTime() : Date.now();
-            return Date.now() + (latest * 1000 - serverNow);
-        },
-
-        set: function () {
-            var endMs = this.latestReturn();
-            if (!endMs) {
-                window.UI.ErrorMessage(I18n.t('alarmNoRuns'));
-                return;
-            }
-            var end = new Date(endMs);
-            window.UI.InfoMessage(I18n.t('alarmEndsAt', {time: end.toTimeString().slice(0, 5)}));
-            if (/android/i.test(navigator.userAgent)) {
-                this.androidIntent(end);
-            } else {
-                this.hostedIcs(end);
-            }
-        },
-
-        // one .ics path for iOS and desktop: ics.agical.io generates the file from
-        // query params (free, account-less) and serves it as a text/calendar
-        // attachment — iOS Safari shows the native "Add All" event preview (which
-        // blob/data URLs can't trigger), desktop browsers just download it.
-        // ponytail: third-party service; self-host a tiny worker if it dies.
-        hostedIcs: function (end) {
-            window.location.href = 'https://ics.agical.io/'
-                + '?subject=' + encodeURIComponent(I18n.t('title'))
-                + '&dtstart=' + encodeURIComponent(end.toISOString())
-                + '&dtend=' + encodeURIComponent(new Date(end.getTime() + 5 * 60000).toISOString())
-                + '&reminder=0'
-                + '&organizer=tilaven'
-                + '&description=' + encodeURIComponent('https://github.com/tilaven/tribalwars-scavenge-assistant/');
-        },
-
-        androidIntent: function (end) {
-            window.location.href = 'intent:#Intent;action=android.intent.action.SET_ALARM'
-                + ';i.android.intent.extra.alarm.HOUR=' + end.getHours()
-                + ';i.android.intent.extra.alarm.MINUTES=' + end.getMinutes()
-                + ';S.android.intent.extra.alarm.MESSAGE=' + encodeURIComponent(I18n.t('title'))
-                + ';end';
-        }
-    };
-
     var Planner = {
         // levels: [{level, name}]
         // returns [{ level, name, units: {unit: count} }]
@@ -816,10 +693,7 @@
             div.id = 'maz-settings';
             div.innerHTML = '<details' + (Settings.collapsed() ? '' : ' open') + '>'
                 + '<summary>' + I18n.t('title') + ' <small style="opacity:.6">v' + VERSION + '</small></summary>'
-                + table + orderRow + '</details>'
-                // outside the <details> so it stays visible when settings are collapsed
-                + '<div class="maz-order"><button type="button" class="btn" data-maz-alarm>'
-                + '&#9200; ' + I18n.t('setAlarm') + '</button></div>';
+                + table + orderRow + '</details>';
 
             // place right after the game's explanatory text, not at the top of the screen
             var anchor = container.querySelector('.explanatory-text');
@@ -862,9 +736,6 @@
             }
             div.querySelectorAll('[data-maz-max-h], [data-maz-max-m]').forEach(function (sel) {
                 sel.addEventListener('change', onMaxTimeChange);
-            });
-            div.querySelector('[data-maz-alarm]').addEventListener('click', function () {
-                Alarm.set();
             });
         }
     };

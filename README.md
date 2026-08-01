@@ -9,7 +9,6 @@ Scavenging Assistant that works in both the browser and the app. It automaticall
 - **Active-level highlight** - pulses the Start button of the level just filled and scrolls it into view (handy on mobile).
 - **Per-unit settings** - set a reserve per unit type and toggle whether each unit is sent at all. Saved in localStorage.
 - **Max run time** - optionally cap how long a scavenge run may take; squads are scaled down to fit (0:00 = off).
-- **Set alarm** - one tap schedules a wake-up for when the last running squad returns: Android opens the Clock app pre-filled, iOS shows a calendar event to add ("Add All"), desktop downloads an .ics file.
 - **Auto language detection** - UI follows the game language (18 languages, fully translated, falls back to English).
 
 ![Scavenge Assistant](assets/img.png)
