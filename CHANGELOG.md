@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### 0.0.7
+- **Set alarm removed** - the alarm button and everything behind it (Android SET_ALARM intent, hosted .ics flow, related translations) is gone; it worked poorly on iOS and couldn't be verified on Android. No other functionality affected.
+
 ### 0.0.6
 - **iOS alarm fixed** - the .ics blob download was a silent no-op on iOS Safari. The button now links to a hosted .ics (ics.agical.io) generated from URL params, so Safari shows the native event preview with "Add All" - tap the button, tap Add, done. Event carries the organizer (tilaven) and a link to this repo. Android/desktop unchanged.
 - **Version in settings** - the settings header now shows the script version next to the (translated) title.
