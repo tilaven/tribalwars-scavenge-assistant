@@ -1,10 +1,10 @@
 // author: tilaven
-// version: 0.0.7
+// version: 0.0.8
 
 (function () {
     'use strict';
 
-    var VERSION = '0.0.7';
+    var VERSION = '0.0.8';
 
     // pick game language from game_data.locale (Polish on pl_*, English otherwise)
     var I18n = {
@@ -303,7 +303,14 @@
                     return;                            // skip the weakest level when asked
                 }
                 if (!opt.is_locked && !opt.scavenging_squad) {
-                    available.push({level: opt.base.id, name: opt.base.name, lootFactor: opt.base.loot_factor});
+                    available.push({
+                        level: opt.base.id,
+                        name: opt.base.name,
+                        lootFactor: opt.base.loot_factor,
+                        durationFactor: opt.base.duration_factor,
+                        durationExponent: opt.base.duration_exponent,
+                        durationInitialSeconds: opt.base.duration_initial_seconds
+                    });
                 }
             });
             available.sort(function (a, b) {
@@ -467,14 +474,18 @@
         }
     };
 
-    // scavenge run duration math:
-    // duration_s = (pow(capacity^2 * 100 * loot_factor^2, 0.45) + 1800) * factor,
-    // factor = world_speed^-0.55 (1 on speed-1 worlds)
+    // scavenge run duration math (same formula the game uses for its preview):
+    // duration_s = (pow(capacity^2 * 100 * loot_factor^2, duration_exponent)
+    //               + duration_initial_seconds) * duration_factor
+    // The three constants come per level from ScavengeScreen options (base.*) —
+    // deriving duration_factor from game_data.speed is unreliable (e.g. pl230:
+    // world speed 1.6 but the script saw 1, so squads returned 23% early).
     var Duration = {
         // carry capacity per unit (matches Units.names())
         CARRY: {spear: 25, sword: 15, axe: 10, archer: 10, light: 80, marcher: 50, heavy: 50},
 
-        factor: function () {
+        // world_speed^-0.55 approximation, only when the game data lacks the factor
+        fallbackFactor: function () {
             var speed = (window.game_data && Number(window.game_data.speed)) || 1;
             return Math.pow(speed, -0.55);
         },
@@ -482,19 +493,24 @@
         // total carry capacity of a squad {unit: count}
         capacity: function (units) {
             var carry = this.CARRY;
+            var s = window.ScavengeScreen;
+            var carryFactor = (s && s.village && Number(s.village.unit_carry_factor)) || 1;
             return Object.keys(units).reduce(function (sum, u) {
                 return sum + units[u] * (carry[u] || 0);
-            }, 0);
+            }, 0) * carryFactor;
         },
 
         // inverse of the formula: biggest capacity still finishing within maxSeconds.
-        // 0 when maxSeconds is under the fixed 1800s floor (no squad is fast enough).
-        maxCapacity: function (maxSeconds, lootFactor) {
-            var inner = maxSeconds / this.factor() - 1800;
+        // 0 when maxSeconds is under the initial-seconds floor (no squad is fast enough).
+        maxCapacity: function (maxSeconds, lvl) {
+            var factor = lvl.durationFactor || this.fallbackFactor();
+            var exponent = lvl.durationExponent || 0.45;
+            var initial = lvl.durationInitialSeconds || 1800;
+            var inner = maxSeconds / factor - initial;
             if (inner <= 0) {
                 return 0;
             }
-            return Math.sqrt(Math.pow(inner, 1 / 0.45) / (100 * lootFactor * lootFactor));
+            return Math.sqrt(Math.pow(inner, 1 / exponent) / (100 * lvl.lootFactor * lvl.lootFactor));
         }
     };
 
@@ -540,7 +556,7 @@
                     unitsToSend[u] = Math.floor(avail[u] * frac);
                 });
                 if (maxSeconds > 0) {
-                    var cap = Duration.maxCapacity(maxSeconds, lvl.lootFactor);
+                    var cap = Duration.maxCapacity(maxSeconds, lvl);
                     var planned = Duration.capacity(unitsToSend);
                     if (planned > cap) {
                         var ratio = cap / planned;
