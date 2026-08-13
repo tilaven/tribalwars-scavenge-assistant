@@ -3,7 +3,7 @@
 ## Unreleased
 
 ### 0.0.8
-- **Max time cap fixed on fast worlds** - the cap sized squads using a duration factor derived from `game_data.speed`, which doesn't match the real scavenge duration factor on some worlds (e.g. pl230, world speed 1.6: squads sized "for 2:00" actually returned after 1:31). The duration constants (`duration_factor`, `duration_exponent`, `duration_initial_seconds`) are now read per level straight from the game's `ScavengeScreen` options — the same data the game uses for its own time preview — with the old speed-based estimate kept only as a fallback. The village's `unit_carry_factor` is now also applied to squad capacity.
+- **Max time cap fixed on fast worlds** - the cap sized squads using a duration factor derived from `game_data.speed`, which doesn't match the real scavenge duration factor on some worlds (e.g. pl230, world speed 1.6)
 
 ### 0.0.7
 - **Set alarm removed** - the alarm button and everything behind it (Android SET_ALARM intent, hosted .ics flow, related translations) is gone; it worked poorly on iOS and couldn't be verified on Android. No other functionality affected.
