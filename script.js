@@ -481,7 +481,7 @@
     // deriving duration_factor from game_data.speed is unreliable (e.g. pl230:
     // world speed 1.6 but the script saw 1, so squads returned 23% early).
     var Duration = {
-        // carry capacity per unit (matches Units.names())
+        // standard carry per unit — fallback only, worlds can differ (see carryOf)
         CARRY: {spear: 25, sword: 15, axe: 10, archer: 10, light: 80, marcher: 50, heavy: 50},
 
         // world_speed^-0.55 approximation, only when the game data lacks the factor
@@ -490,13 +490,22 @@
             return Math.pow(speed, -0.55);
         },
 
+        // carry per unit: prefer the live stats the game ships with the screen
+        // (ScavengeScreen.sendable_units), worlds can tweak unit stats
+        carryOf: function (unit) {
+            var s = window.ScavengeScreen;
+            var stats = s && s.sendable_units && s.sendable_units[unit];
+            var carry = stats && Number(stats.carry);
+            return carry > 0 ? carry : (this.CARRY[unit] || 0);
+        },
+
         // total carry capacity of a squad {unit: count}
         capacity: function (units) {
-            var carry = this.CARRY;
+            var self = this;
             var s = window.ScavengeScreen;
             var carryFactor = (s && s.village && Number(s.village.unit_carry_factor)) || 1;
             return Object.keys(units).reduce(function (sum, u) {
-                return sum + units[u] * (carry[u] || 0);
+                return sum + units[u] * self.carryOf(u);
             }, 0) * carryFactor;
         },
 

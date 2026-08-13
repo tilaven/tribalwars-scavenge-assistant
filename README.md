@@ -12,3 +12,6 @@ Scavenging Assistant that works in both the browser and the app. It automaticall
 - **Auto language detection** - UI follows the game language (18 languages, fully translated, falls back to English).
 
 ![Scavenge Assistant](assets/img.png)
+
+## Development
+`npm test` runs the test suite (plain `node --test`, no dependencies needed) — it executes `script.js` against a stubbed scavenge screen and checks the troop splits and max-time math against the game's duration formula.
