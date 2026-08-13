@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### 0.0.8
+- **Max time cap fixed on fast worlds** - the cap sized squads using a duration factor derived from `game_data.speed`, which doesn't match the real scavenge duration factor on some worlds (e.g. pl230, world speed 1.6)
+- **Unit carry from game data** - per-unit carry capacity is read from `ScavengeScreen.sendable_units` (worlds can tweak unit stats); the standard values remain as fallback.
+- **Tests** - `npm test` (plain `node --test`, no dependencies) runs the planner against a stubbed scavenge screen: the pl230 regression, the speed fallback, sequential fills, carry overrides, skip-level-1, reserves.
+
 ### 0.0.7
 - **Set alarm removed** - the alarm button and everything behind it (Android SET_ALARM intent, hosted .ics flow, related translations) is gone; it worked poorly on iOS and couldn't be verified on Android. No other functionality affected.
 

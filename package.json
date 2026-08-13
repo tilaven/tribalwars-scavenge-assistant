@@ -1,0 +1,7 @@
+{
+  "name": "tribalwars-scavenge-assistant",
+  "private": true,
+  "scripts": {
+    "test": "node --test"
+  }
+}
