@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### 0.0.9
+- **Algorithm choice** - "Po równo / Even split" (unchanged behaviour: capacity by loot factor, every level home at the same time) or "Do maks. czasu / Fill to max time" (the first level in the chosen order is topped up to the max time, the rest spills to the next one, so the last levels can stay empty). Persisted in localStorage, defaults to the even split. With max time 0:00 the fill mode puts everything on the first level.
+
 ### 0.0.8
 - **Max time cap fixed on fast worlds** - the cap sized squads using a duration factor derived from `game_data.speed`, which doesn't match the real scavenge duration factor on some worlds (e.g. pl230, world speed 1.6)
 - **Unit carry from game data** - per-unit carry capacity is read from `ScavengeScreen.sendable_units` (worlds can tweak unit stats); the standard values remain as fallback.

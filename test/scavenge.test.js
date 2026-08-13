@@ -2,7 +2,7 @@
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const {runScript, gameDuration, PL230_DURATION_FACTOR} = require('./helpers');
+const {runScript, gameDuration, PL230_DURATION_FACTOR, LOOT_FACTORS} = require('./helpers');
 
 const TWO_HOURS = 7200;
 
@@ -86,6 +86,40 @@ test('sequential runs split 1405 spears into squads that all fit the cap', () =>
         busy.push(level);             // level now occupied
     }
     assert.equal(home.spear, 0, 'every spear gets sent');
+});
+
+// algorithm 'fill': the first level in order is topped up to the max time and the
+// rest spills downwards, instead of every level finishing together.
+test('fill algorithm tops the first level up to the cap instead of splitting evenly', () => {
+    const settings = {order: 'desc', maxDuration: 120};
+    const even = runScript({home: {spear: 700}, settings: settings});
+    assert.equal(even.filled.spear, 53);                  // 1/13 of the army (weights 4:6:12:40)
+
+    const fill = runScript({
+        home: {spear: 700},
+        settings: Object.assign({algorithm: 'fill'}, settings)
+    });
+    assert.equal(fill.filled.spear, 108);
+    const duration = gameDuration(108 * 25, LOOT_FACTORS[4], PL230_DURATION_FACTOR);
+    assert.ok(duration <= TWO_HOURS, 'run must fit in the cap');
+    assert.ok(duration > TWO_HOURS * 0.97, 'run should use nearly the whole cap');
+});
+
+test('fill algorithm leaves the last levels empty once the army runs out', () => {
+    const home = {spear: 300};
+    const busy = [];
+    const sent = [];
+    for (const level of [4, 3, 2, 1]) {
+        const {filled} = runScript({
+            home: home,
+            busy: busy,
+            settings: {order: 'desc', maxDuration: 120, algorithm: 'fill'}
+        });
+        sent.push(filled.spear);
+        home.spear -= filled.spear;
+        busy.push(level);
+    }
+    assert.deepEqual(sent, [108, 162, 30, 0]);            // levels 4 and 3 full, level 1 skipped
 });
 
 test('unit carry is read from ScavengeScreen.sendable_units, not hardcoded', () => {

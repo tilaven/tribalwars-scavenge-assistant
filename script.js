@@ -1,10 +1,10 @@
 // author: tilaven
-// version: 0.0.8
+// version: 0.0.9
 
 (function () {
     'use strict';
 
-    var VERSION = '0.0.8';
+    var VERSION = '0.0.9';
 
     // pick game language from game_data.locale (Polish on pl_*, English otherwise)
     var I18n = {
@@ -18,6 +18,9 @@
                 order: 'Kolejność',
                 orderLowFirst: 'Od najniższego',
                 orderHighFirst: 'Od najwyższego',
+                algorithm: 'Algorytm',
+                algoEven: 'Po równo',
+                algoFill: 'Do maks. czasu',
                 maxTime: 'Maks. czas',
                 redirecting: 'Skrypt działa tylko na ekranie zbieractwa, przekierowuję.',
                 filled: 'Wypełniono poziom {level} ({name}). Kliknij Start i odpal ponownie dla kolejnych.'
@@ -31,6 +34,9 @@
                 order: 'Order',
                 orderLowFirst: 'Lowest first',
                 orderHighFirst: 'Highest first',
+                algorithm: 'Algorithm',
+                algoEven: 'Even split',
+                algoFill: 'Fill to max time',
                 maxTime: 'Max time',
                 redirecting: 'Script works only in Scavenging page, redirecting.',
                 filled: 'Filled level {level} ({name}). Click Start, then run again for the next ones.'
@@ -44,6 +50,9 @@
                 order: 'الترتيب',
                 orderLowFirst: 'من الأدنى',
                 orderHighFirst: 'من الأعلى',
+                algorithm: 'الخوارزمية',
+                algoEven: 'تقسيم متساوٍ',
+                algoFill: 'ملء حتى أقصى وقت',
                 maxTime: 'أقصى وقت',
                 redirecting: 'هذا السكربت يعمل فقط في صفحة النهب، جارٍ إعادة التوجيه.',
                 filled: 'تم ملء المستوى {level} ({name}). اضغط ابدأ، ثم شغّل السكربت مرة أخرى للمستويات التالية.'
@@ -57,6 +66,9 @@
                 order: 'Pořadí',
                 orderLowFirst: 'Od nejnižší',
                 orderHighFirst: 'Od nejvyšší',
+                algorithm: 'Algoritmus',
+                algoEven: 'Rovnoměrně',
+                algoFill: 'Do max. času',
                 maxTime: 'Max. čas',
                 redirecting: 'Skript funguje pouze na stránce sběru surovin, přesměrovávám.',
                 filled: 'Vyplněna úroveň {level} ({name}). Klikni na Start, poté spusť skript znovu pro další.'
@@ -70,6 +82,9 @@
                 order: 'Volgorde',
                 orderLowFirst: 'Laagste eerst',
                 orderHighFirst: 'Hoogste eerst',
+                algorithm: 'Algoritme',
+                algoEven: 'Gelijk verdelen',
+                algoFill: 'Tot max. tijd',
                 maxTime: 'Max. tijd',
                 redirecting: 'Script werkt alleen op de rooftochten-pagina, doorverwijzen.',
                 filled: 'Niveau {level} ({name}) ingevuld. Klik op Start en voer opnieuw uit voor de volgende.'
@@ -83,6 +98,9 @@
                 order: 'Ordre',
                 orderLowFirst: 'Du plus bas',
                 orderHighFirst: 'Du plus haut',
+                algorithm: 'Algorithme',
+                algoEven: 'Répartition égale',
+                algoFill: 'Jusqu\'au temps max',
                 maxTime: 'Temps max',
                 redirecting: 'Le script fonctionne uniquement sur la page de collecte, redirection.',
                 filled: 'Niveau {level} ({name}) rempli. Cliquez sur Démarrer, puis relancez pour les suivants.'
@@ -96,6 +114,9 @@
                 order: 'Reihenfolge',
                 orderLowFirst: 'Niedrigste zuerst',
                 orderHighFirst: 'Höchste zuerst',
+                algorithm: 'Algorithmus',
+                algoEven: 'Gleichmäßig',
+                algoFill: 'Bis zur max. Zeit',
                 maxTime: 'Max. Zeit',
                 redirecting: 'Skript funktioniert nur auf der Raubzug-Seite, leite weiter.',
                 filled: 'Stufe {level} ({name}) ausgefüllt. Klicke auf Start und führe das Skript erneut aus für die nächsten.'
@@ -109,6 +130,9 @@
                 order: 'Orden',
                 orderLowFirst: 'Del más bajo',
                 orderHighFirst: 'Del más alto',
+                algorithm: 'Algoritmo',
+                algoEven: 'Reparto igual',
+                algoFill: 'Hasta el tiempo máx.',
                 maxTime: 'Tiempo máx.',
                 redirecting: 'El script solo funciona en la página de recolección, redirigiendo.',
                 filled: 'Nivel {level} ({name}) rellenado. Haz clic en Iniciar y vuelve a ejecutar para los siguientes.'
@@ -122,6 +146,9 @@
                 order: 'Ordine',
                 orderLowFirst: 'Dal più basso',
                 orderHighFirst: 'Dal più alto',
+                algorithm: 'Algoritmo',
+                algoEven: 'Divisione equa',
+                algoFill: 'Fino al tempo max',
                 maxTime: 'Tempo max',
                 redirecting: 'Lo script funziona solo nella pagina di rovistamento, reindirizzamento.',
                 filled: 'Livello {level} ({name}) compilato. Clicca Avvia, poi riavvia lo script per i successivi.'
@@ -135,6 +162,9 @@
                 order: 'Ordem',
                 orderLowFirst: 'Do mais baixo',
                 orderHighFirst: 'Do mais alto',
+                algorithm: 'Algoritmo',
+                algoEven: 'Divisão igual',
+                algoFill: 'Até ao tempo máx.',
                 maxTime: 'Tempo máx.',
                 redirecting: 'O script só funciona na página de busca minuciosa, a redirecionar.',
                 filled: 'Nível {level} ({name}) preenchido. Clica em Iniciar e executa novamente para os próximos.'
@@ -148,6 +178,9 @@
                 order: 'Ordem',
                 orderLowFirst: 'Do mais baixo',
                 orderHighFirst: 'Do mais alto',
+                algorithm: 'Algoritmo',
+                algoEven: 'Divisão igual',
+                algoFill: 'Até o tempo máx.',
                 maxTime: 'Tempo máx.',
                 redirecting: 'O script só funciona na página de coleta, redirecionando.',
                 filled: 'Nível {level} ({name}) preenchido. Clique em Iniciar e execute novamente para os próximos.'
@@ -161,6 +194,9 @@
                 order: 'Ordine',
                 orderLowFirst: 'De la cel mai mic',
                 orderHighFirst: 'De la cel mai mare',
+                algorithm: 'Algoritm',
+                algoEven: 'Împărțire egală',
+                algoFill: 'Până la timpul max.',
                 maxTime: 'Timp max.',
                 redirecting: 'Scriptul funcționează doar pe pagina de curățare, redirecționare.',
                 filled: 'Nivelul {level} ({name}) completat. Apasă Start, apoi rulează din nou pentru următoarele.'
@@ -174,6 +210,9 @@
                 order: 'Poradie',
                 orderLowFirst: 'Od najnižšej',
                 orderHighFirst: 'Od najvyššej',
+                algorithm: 'Algoritmus',
+                algoEven: 'Rovnomerne',
+                algoFill: 'Do max. času',
                 maxTime: 'Max. čas',
                 redirecting: 'Skript funguje iba na stránke zberu surovín, presmerovanie.',
                 filled: 'Úroveň {level} ({name}) vyplnená. Klikni na Štart, potom spusti znova pre ďalšie.'
@@ -187,6 +226,9 @@
                 order: 'Sorrend',
                 orderLowFirst: 'Legalacsonyabbtól',
                 orderHighFirst: 'Legmagasabbtól',
+                algorithm: 'Algoritmus',
+                algoEven: 'Egyenlő elosztás',
+                algoFill: 'Max. időig',
                 maxTime: 'Max. idő',
                 redirecting: 'A szkript csak a gyűjtögetés oldalon működik, átirányítás.',
                 filled: '{level} ({name}) szint kitöltve. Kattints a Start gombra, majd futtasd újra a többihez.'
@@ -200,6 +242,9 @@
                 order: 'Σειρά',
                 orderLowFirst: 'Από το χαμηλότερο',
                 orderHighFirst: 'Από το υψηλότερο',
+                algorithm: 'Αλγόριθμος',
+                algoEven: 'Ισομερής κατανομή',
+                algoFill: 'Μέχρι τον μέγ. χρόνο',
                 maxTime: 'Μέγ. χρόνος',
                 redirecting: 'Το script λειτουργεί μόνο στη σελίδα σάρωσης, ανακατεύθυνση.',
                 filled: 'Συμπληρώθηκε το επίπεδο {level} ({name}). Πάτησε Έναρξη και τρέξε ξανά για τα επόμενα.'
@@ -213,6 +258,9 @@
                 order: 'Sıralama',
                 orderLowFirst: 'En düşükten',
                 orderHighFirst: 'En yüksekten',
+                algorithm: 'Algoritma',
+                algoEven: 'Eşit dağıtım',
+                algoFill: 'Maks. süreye kadar',
                 maxTime: 'Maks. süre',
                 redirecting: 'Komut dosyası yalnızca temizlik sayfasında çalışır, yönlendiriliyor.',
                 filled: '{level} ({name}) seviyesi dolduruldu. Başlat\'a tıkla, sonra sonrakiler için tekrar çalıştır.'
@@ -226,6 +274,9 @@
                 order: 'Порядок',
                 orderLowFirst: 'С низшего',
                 orderHighFirst: 'С высшего',
+                algorithm: 'Алгоритм',
+                algoEven: 'Поровну',
+                algoFill: 'До макс. времени',
                 maxTime: 'Макс. время',
                 redirecting: 'Скрипт работает только на странице сбора ресурсов, перенаправление.',
                 filled: 'Уровень {level} ({name}) заполнен. Нажми Старт, затем запусти снова для следующих.'
@@ -239,6 +290,9 @@
                 order: 'Порядок',
                 orderLowFirst: 'Від найнижчого',
                 orderHighFirst: 'Від найвищого',
+                algorithm: 'Алгоритм',
+                algoEven: 'Порівну',
+                algoFill: 'До макс. часу',
                 maxTime: 'Макс. час',
                 redirecting: 'Скрипт працює лише на сторінці збору ресурсів, перенаправлення.',
                 filled: 'Рівень {level} ({name}) заповнено. Натисни Старт, потім запусти знову для наступних.'
@@ -399,6 +453,7 @@
                     collapsed: !!stored.collapsed,                       // default expanded
                     order: stored.order === 'desc' ? 'desc' : 'asc',     // default lowest first
                     skipFirst: !!stored.skipFirst,                       // default include level 1
+                    algorithm: stored.algorithm === 'fill' ? 'fill' : 'even',  // default even split
                     maxDuration: Math.max(0, Number(stored.maxDuration) || 0)  // minutes, 0 = no cap
                 };
                 Units.names().forEach(function (u) {
@@ -454,6 +509,14 @@
         },
         setSkipFirst: function (value) {
             this.load().skipFirst = !!value;
+            this.save();
+        },
+
+        algorithm: function () {
+            return this.load().algorithm;
+        },
+        setAlgorithm: function (value) {
+            this.load().algorithm = value === 'fill' ? 'fill' : 'even';
             this.save();
         },
 
@@ -527,20 +590,9 @@
         // levels: [{level, name}]
         // returns [{ level, name, units: {unit: count} }]
         //
-        // We fill one level per run and re-run for the rest. Splitting the troops
-        // currently at home across the currently free levels by weight reproduces the
-        // ideal even split with no leftover (e.g. 3/8 split 2:1 = exactly 2/8 and 1/8).
+        // We fill one level per run and re-run for the rest.
         plan: function (levels) {
             var names = Units.names();
-
-            // weights = 1/factor → capacity ∝ weight gives equal finish time (15:6:3:2)
-            var sumW = 0;
-            var weight = {};
-            levels.forEach(function (lvl) {
-                var w = 1 / lvl.lootFactor;
-                weight[lvl.level] = w;
-                sumW += w;
-            });
 
             // sendable per unit = (in village − reserve), 0 if the unit is disabled
             var avail = {};
@@ -552,11 +604,45 @@
                 avail[u] = Math.max(0, Units.available(u) - Settings.reserve(u));
             });
 
-            // cap: scale each level's squad down so its run fits in maxSeconds.
+            var maxSeconds = Settings.maxDuration() * 60;
+            return Settings.algorithm() === 'fill'
+                ? this.planFill(levels, names, avail, maxSeconds)
+                : this.planEven(levels, names, avail, maxSeconds);
+        },
+
+        // scale a squad down so its run fits in maxSeconds (no-op without a cap)
+        trim: function (units, names, lvl, maxSeconds) {
+            if (maxSeconds <= 0) {
+                return;
+            }
+            var cap = Duration.maxCapacity(maxSeconds, lvl);
+            var planned = Duration.capacity(units);
+            if (planned <= cap) {
+                return;
+            }
+            var ratio = cap / planned;
+            names.forEach(function (u) {
+                units[u] = Math.floor(units[u] * ratio);
+            });
+        },
+
+        // even: splitting the troops currently at home across the currently free
+        // levels by weight reproduces the ideal even split with no leftover
+        // (e.g. 3/8 split 2:1 = exactly 2/8 and 1/8).
+        planEven: function (levels, names, avail, maxSeconds) {
+            var self = this;
+
+            // weights = 1/factor → capacity ∝ weight gives equal finish time (15:6:3:2)
+            var sumW = 0;
+            var weight = {};
+            levels.forEach(function (lvl) {
+                var w = 1 / lvl.lootFactor;
+                weight[lvl.level] = w;
+                sumW += w;
+            });
+
             // the split equalizes finish time, so either every level exceeds the cap
             // (all get trimmed to exactly T) or none does — no redistribution needed.
-            var maxSeconds = Settings.maxDuration() * 60;
-
             // same fraction of each unit to each level → capacity in proportion to weights
             return levels.map(function (lvl) {
                 var frac = weight[lvl.level] / sumW;
@@ -564,16 +650,26 @@
                 names.forEach(function (u) {
                     unitsToSend[u] = Math.floor(avail[u] * frac);
                 });
-                if (maxSeconds > 0) {
-                    var cap = Duration.maxCapacity(maxSeconds, lvl);
-                    var planned = Duration.capacity(unitsToSend);
-                    if (planned > cap) {
-                        var ratio = cap / planned;
-                        names.forEach(function (u) {
-                            unitsToSend[u] = Math.floor(unitsToSend[u] * ratio);
-                        });
-                    }
-                }
+                self.trim(unitsToSend, names, lvl, maxSeconds);
+                return {level: lvl.level, name: lvl.name, units: unitsToSend};
+            });
+        },
+
+        // fill: each level in the chosen order takes everything that still fits the
+        // max time, the next one gets the leftovers — later levels can end up empty.
+        // ponytail: without a cap this dumps everything on the first level, which is
+        // what "fill up to no limit" means; the even split is the other menu entry.
+        planFill: function (levels, names, avail, maxSeconds) {
+            var self = this;
+            return levels.map(function (lvl) {
+                var unitsToSend = {};
+                names.forEach(function (u) {
+                    unitsToSend[u] = avail[u];
+                });
+                self.trim(unitsToSend, names, lvl, maxSeconds);
+                names.forEach(function (u) {
+                    avail[u] -= unitsToSend[u];        // rest goes to the next level
+                });
                 return {level: lvl.level, name: lvl.name, units: unitsToSend};
             });
         }
@@ -701,18 +797,23 @@
                 }).join('');
             }
 
-            var orderRow = '<div class="maz-order">' + I18n.t('order') + ': '
+            var orderRow = '<div class="maz-order"><label><input type="checkbox" data-maz-skip-first'
+                + (Settings.skipFirst() ? ' checked' : '') + '> ' + I18n.t('skipFirst') + '</label></div>'
+                + '<div class="maz-order">' + I18n.t('order') + ': '
                 + '<select data-maz-order>'
                 + '<option value="asc"' + (Settings.order() === 'asc' ? ' selected' : '') + '>' + I18n.t('orderLowFirst') + ' (1 → 4)</option>'
                 + '<option value="desc"' + (Settings.order() === 'desc' ? ' selected' : '') + '>' + I18n.t('orderHighFirst') + ' (4 → 1)</option>'
                 + '</select></div>'
-                + '<div class="maz-order"><label><input type="checkbox" data-maz-skip-first'
-                + (Settings.skipFirst() ? ' checked' : '') + '> ' + I18n.t('skipFirst') + '</label></div>'
                 + '<div class="maz-order">' + I18n.t('maxTime') + ': '
                 + '<select data-maz-max-h>' + timeOptions(maxHours, maxH, false) + '</select>'
                 + ' : '
                 + '<select data-maz-max-m>' + timeOptions(maxMinutes, maxM, true) + '</select>'
-                + '</div>';
+                + '</div>'
+                + '<div class="maz-order">' + I18n.t('algorithm') + ': '
+                + '<select data-maz-algorithm>'
+                + '<option value="even"' + (Settings.algorithm() === 'even' ? ' selected' : '') + '>' + I18n.t('algoEven') + '</option>'
+                + '<option value="fill"' + (Settings.algorithm() === 'fill' ? ' selected' : '') + '>' + I18n.t('algoFill') + '</option>'
+                + '</select></div>';
 
             var div = document.createElement('div');
             div.id = 'maz-settings';
@@ -744,6 +845,10 @@
                     Settings.setReserve(inp.getAttribute('data-maz-reserve'), inp.value);
                     App.run();                               // re-split with the new setting
                 });
+            });
+            div.querySelector('[data-maz-algorithm]').addEventListener('change', function () {
+                Settings.setAlgorithm(this.value);
+                App.run();                                   // re-plan with the other algorithm
             });
             div.querySelector('[data-maz-order]').addEventListener('change', function () {
                 Settings.setOrder(this.value);
