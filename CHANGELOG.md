@@ -3,7 +3,7 @@
 ## Unreleased
 
 ### 0.0.8
-- **Max time cap fixed on fast worlds** - the cap sized squads using a duration factor derived from `game_data.speed`, which doesn't match the real scavenge duration factor on some worlds (e.g. pl230, world speed 1.6: squads sized "for 2:00" actually returned after 1:31). The duration constants (`duration_factor`, `duration_exponent`, `duration_initial_seconds`) are now read per level straight from the game's `ScavengeScreen` options — the same data the game uses for its own time preview — with the old speed-based estimate kept only as a fallback. The village's `unit_carry_factor` is now also applied to squad capacity.
+- **Max time cap fixed on fast worlds** - the cap sized squads using a duration factor derived from `game_data.speed`, which doesn't match the real scavenge duration factor on some worlds (e.g. pl230, world speed 1.6)
 - **Unit carry from game data** - per-unit carry capacity is read from `ScavengeScreen.sendable_units` (worlds can tweak unit stats); the standard values remain as fallback.
 - **Tests** - `npm test` (plain `node --test`, no dependencies) runs the planner against a stubbed scavenge screen: the pl230 regression, the speed fallback, sequential fills, carry overrides, skip-level-1, reserves.
 
