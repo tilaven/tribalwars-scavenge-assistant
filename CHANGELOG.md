@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### 0.0.10
+- **Even split now lands on the same minute** - the split scaled every unit type by the same fraction and floored it, so each squad went out short by up to one unit per type (an LC is worth 80 capacity) and the accumulated leftovers landed on the level filled last, which came home minutes after the others. Each level now gets a capacity target and the leftover units top the squads up to it, biggest carry first.
+- Measured over four sequential runs on 200 spears / 120 swords / 80 axes / 40 LC / 20 heavy: the spread between the levels' finish times drops from **5m32s to 7s** (order 1 → 4) and from **2m50s to 7s** (order 4 → 1). Ten times that army: **4m39s → 11s**. Early-game 60/30/20/10: **5m27s → 17s**. With a 2h cap and an army too big for it: **2m29s → 17s**. A single unit type was fine before and stays at 34s (one spear is worth 25 capacity, nothing to redistribute).
+- Squads also use the max time more fully - the pl230 case sends 8110 of the 8113 capacity the 2h cap allows, instead of 8010.
+
 ### 0.0.9
 - **Algorithm choice** - "Po równo / Even split" (unchanged behaviour: capacity by loot factor, every level home at the same time) or "Do maks. czasu / Fill to max time" (the first level in the chosen order is topped up to the max time, the rest spills to the next one, so the last levels can stay empty). Persisted in localStorage, defaults to the even split. With max time 0:00 the fill mode puts everything on the first level.
 

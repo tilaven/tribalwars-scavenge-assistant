@@ -18,12 +18,12 @@ test('max-time cap uses the duration factor from ScavengeScreen (pl230 case)', (
     assert.match(messages[0], /2/);                       // fills level 2 first (desc)
     assert.deepEqual(
         {axe: filled.axe, light: filled.light, heavy: filled.heavy},
-        {axe: 283, light: 56, heavy: 14}
+        {axe: 285, light: 57, heavy: 14}
     );
-    const capacity = 283 * 10 + 56 * 80 + 14 * 50;
+    const capacity = 285 * 10 + 57 * 80 + 14 * 50;
     const duration = gameDuration(capacity, 0.25, PL230_DURATION_FACTOR);
     assert.ok(duration <= TWO_HOURS, 'run must fit in the cap');
-    assert.ok(duration > TWO_HOURS * 0.97, 'run should use nearly the whole cap');
+    assert.ok(duration > TWO_HOURS * 0.999, 'run should use all but seconds of the cap');
 });
 
 test('without a cap the split is purely weight-based', () => {
@@ -32,11 +32,12 @@ test('without a cap the split is purely weight-based', () => {
         busy: [3, 4],
         settings: {order: 'desc', maxDuration: 0}
     });
-    // level 2 gets 1/lf weight 4 of (10+4) total
+    // level 2 gets 1/lf weight 4 of (10+4) total = 10171 of 35600 capacity
     assert.deepEqual(
         {axe: filled.axe, light: filled.light, heavy: filled.heavy},
-        {axe: 354, light: 71, heavy: 18}
+        {axe: 354, light: 71, heavy: 19}
     );
+    assert.equal(354 * 10 + 71 * 80 + 19 * 50, 10170);   // 1 short of the exact share
 });
 
 test('falls back to world_speed^-0.55 when the game omits duration fields', () => {
@@ -50,7 +51,7 @@ test('falls back to world_speed^-0.55 when the game omits duration fields', () =
     // 1.6^-0.55 equals the pl230 factor exactly, so the result must match
     assert.deepEqual(
         {axe: withSpeed.filled.axe, light: withSpeed.filled.light, heavy: withSpeed.filled.heavy},
-        {axe: 283, light: 56, heavy: 14}
+        {axe: 285, light: 57, heavy: 14}
     );
 
     const noSpeed = runScript({
@@ -60,10 +61,10 @@ test('falls back to world_speed^-0.55 when the game omits duration fields', () =
         durationFactor: null,
         gameDataSpeed: null          // as observed in the real game
     });
-    // last resort behaves like a speed-1 world (the historical 0.0.7 result)
+    // last resort behaves like a speed-1 world: same mix, smaller squad
     assert.deepEqual(
         {axe: noSpeed.filled.axe, light: noSpeed.filled.light, heavy: noSpeed.filled.heavy},
-        {axe: 196, light: 39, heavy: 9}
+        {axe: 199, light: 39, heavy: 10}
     );
 });
 
@@ -152,7 +153,7 @@ test('skip-level-1 sends everything the cap allows to level 2', () => {
     assert.match(messages[0], /2/);
     assert.deepEqual(
         {axe: filled.axe, light: filled.light, heavy: filled.heavy},
-        {axe: 282, light: 56, heavy: 14}
+        {axe: 285, light: 57, heavy: 14}
     );
 });
 
@@ -168,6 +169,47 @@ test('reserves and disabled units are excluded from the split', () => {
     });
     assert.deepEqual(
         {axe: filled.axe, light: filled.light, heavy: filled.heavy},
-        {axe: 68, light: 0, heavy: 18}
+        {axe: 69, light: 0, heavy: 18}
     );
+});
+
+// the even split used to floor every unit type separately, so each squad went out a
+// bit short and the leftovers all landed on the level filled last — on this army it
+// came home 5.5 minutes after the others. Targeting capacity keeps them together.
+test('even split brings all four levels home within a minute of each other', () => {
+    const CARRY = {spear: 25, sword: 15, axe: 10, light: 80, heavy: 50};
+    const home = {spear: 200, sword: 120, axe: 80, light: 40, heavy: 20};
+    const busy = [];
+    const durations = [];
+    for (const level of [1, 2, 3, 4]) {
+        const {filled} = runScript({home: home, busy: busy, settings: {maxDuration: 0}});
+        let capacity = 0;
+        for (const unit of Object.keys(CARRY)) {
+            capacity += (filled[unit] || 0) * CARRY[unit];
+            home[unit] -= filled[unit] || 0;
+        }
+        busy.push(level);
+        durations.push(gameDuration(capacity, LOOT_FACTORS[level], PL230_DURATION_FACTOR));
+    }
+    const spread = Math.max(...durations) - Math.min(...durations);
+    assert.ok(spread < 60, 'levels finish ' + Math.round(spread) + 's apart, want < 60s');
+    assert.deepEqual(home, {spear: 0, sword: 0, axe: 0, light: 0, heavy: 0});
+});
+
+test('capped squads use the max time to the second on every level', () => {
+    const CARRY = {spear: 25, sword: 15, axe: 10, light: 80, heavy: 50};
+    const home = {spear: 2000, sword: 1200, axe: 800, light: 400, heavy: 200};
+    const busy = [];
+    for (const level of [1, 2, 3, 4]) {
+        const {filled} = runScript({home: home, busy: busy, settings: {maxDuration: 120}});
+        let capacity = 0;
+        for (const unit of Object.keys(CARRY)) {
+            capacity += (filled[unit] || 0) * CARRY[unit];
+            home[unit] -= filled[unit] || 0;
+        }
+        busy.push(level);
+        const duration = gameDuration(capacity, LOOT_FACTORS[level], PL230_DURATION_FACTOR);
+        assert.ok(duration <= TWO_HOURS, 'level ' + level + ' fits in 2h');
+        assert.ok(duration > TWO_HOURS * 0.995, 'level ' + level + ' wastes none of the cap');
+    }
 });
