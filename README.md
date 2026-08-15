@@ -2,7 +2,7 @@
 Scavenging Assistant that works in both the browser and the app. It automatically splits your troops across the available scavenging levels so they finish at the same time and fills in the form - you just click "Start".
 
 ## Features
-- **Algorithm** - **Even split** divides troops by loot factor so all running levels finish together; **Fill to max time** tops the first level in your fill order up to the max time and passes the leftovers down, which sends more loot per run when the army cannot fill every level (later levels may get nothing).
+- **Algorithm** - **Even split** divides troops by loot factor so all running levels finish together (within seconds, whatever mix of units you send); **Fill to max time** tops the first level in your fill order up to the max time and passes the leftovers down, which sends more loot per run when the army cannot fill every level (later levels may get nothing).
 - **Auto-advance** - fills the first free level; clicking Start sends the squad, then automatically fills and scrolls to the next free level.
 - **Fill order** - choose lowest level first (1 → 4) or highest first (4 → 1).
 - **Skip level 1** - optionally leave the weakest level out of the split.

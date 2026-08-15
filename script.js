@@ -1,10 +1,10 @@
 // author: tilaven
-// version: 0.0.9
+// version: 0.0.10
 
 (function () {
     'use strict';
 
-    var VERSION = '0.0.9';
+    var VERSION = '0.0.10';
 
     // pick game language from game_data.locale (Polish on pl_*, English otherwise)
     var I18n = {
@@ -562,14 +562,19 @@
             return carry > 0 ? carry : (this.CARRY[unit] || 0);
         },
 
+        // capacity a single unit of this type hauls (village bonus included)
+        unitCapacity: function (unit) {
+            var s = window.ScavengeScreen;
+            var carryFactor = (s && s.village && Number(s.village.unit_carry_factor)) || 1;
+            return this.carryOf(unit) * carryFactor;
+        },
+
         // total carry capacity of a squad {unit: count}
         capacity: function (units) {
             var self = this;
-            var s = window.ScavengeScreen;
-            var carryFactor = (s && s.village && Number(s.village.unit_carry_factor)) || 1;
             return Object.keys(units).reduce(function (sum, u) {
-                return sum + units[u] * self.carryOf(u);
-            }, 0) * carryFactor;
+                return sum + units[u] * self.unitCapacity(u);
+            }, 0);
         },
 
         // inverse of the formula: biggest capacity still finishing within maxSeconds.
@@ -626,32 +631,67 @@
             });
         },
 
-        // even: splitting the troops currently at home across the currently free
-        // levels by weight reproduces the ideal even split with no leftover
-        // (e.g. 3/8 split 2:1 = exactly 2/8 and 1/8).
+        // even: capacity in the ratio 1/loot_factor (15:6:3:2) makes every level come
+        // home at the same moment. Each level gets a capacity target and the same mix
+        // of units; the rounding leftovers then top the squads up to their target.
         planEven: function (levels, names, avail, maxSeconds) {
-            var self = this;
-
-            // weights = 1/factor → capacity ∝ weight gives equal finish time (15:6:3:2)
             var sumW = 0;
-            var weight = {};
             levels.forEach(function (lvl) {
-                var w = 1 / lvl.lootFactor;
-                weight[lvl.level] = w;
-                sumW += w;
+                sumW += 1 / lvl.lootFactor;
             });
 
-            // the split equalizes finish time, so either every level exceeds the cap
-            // (all get trimmed to exactly T) or none does — no redistribution needed.
-            // same fraction of each unit to each level → capacity in proportion to weights
-            return levels.map(function (lvl) {
-                var frac = weight[lvl.level] / sumW;
-                var unitsToSend = {};
+            var total = Duration.capacity(avail);
+            var left = {};                                 // units not handed out yet
+            names.forEach(function (u) {
+                left[u] = avail[u];
+            });
+
+            // target = this level's share of the total capacity, never more than the
+            // max time allows. Sending target/total of every unit type keeps the squads
+            // mixed the same way and lands each one just under its target.
+            var plan = levels.map(function (lvl) {
+                var share = total * (1 / lvl.lootFactor) / sumW;
+                var target = maxSeconds > 0
+                    ? Math.min(share, Duration.maxCapacity(maxSeconds, lvl)) : share;
+                var units = {};
                 names.forEach(function (u) {
-                    unitsToSend[u] = Math.floor(avail[u] * frac);
+                    units[u] = total > 0 ? Math.floor(avail[u] * target / total) : 0;
+                    left[u] -= units[u];
                 });
-                self.trim(unitsToSend, names, lvl, maxSeconds);
-                return {level: lvl.level, name: lvl.name, units: unitsToSend};
+                return {
+                    level: lvl.level, name: lvl.name, units: units,
+                    target: target, filled: Duration.capacity(units)
+                };
+            });
+
+            // flooring costs every squad up to one unit per type (an LC is worth 80
+            // capacity), and the leftovers used to pile up on the last level filled,
+            // which then came home ~5 min late. Hand them out biggest-carry first, each
+            // to the level furthest below its target, so the squads even out instead.
+            var byCarry = names.slice().sort(function (a, b) {
+                return Duration.unitCapacity(b) - Duration.unitCapacity(a);
+            });
+            byCarry.forEach(function (u) {
+                var unitCap = Duration.unitCapacity(u);
+                for (var n = left[u]; n > 0; n--) {
+                    var best = plan[0];
+                    for (var i = 1; i < plan.length; i++) {
+                        if (plan[i].target - plan[i].filled > best.target - best.filled) {
+                            best = plan[i];
+                        }
+                    }
+                    // under a max time the target is a ceiling, so what no longer fits
+                    // stays home; without one every unit is sent as before.
+                    if (maxSeconds > 0 && best.target - best.filled < unitCap) {
+                        return;
+                    }
+                    best.units[u]++;
+                    best.filled += unitCap;
+                }
+            });
+
+            return plan.map(function (p) {
+                return {level: p.level, name: p.name, units: p.units};
             });
         },
 
